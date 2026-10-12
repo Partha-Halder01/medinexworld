@@ -1,0 +1,22 @@
+# ----------------------------------------------------------------------
+# Phusion Passenger Node.js Configuration
+# ----------------------------------------------------------------------
+PassengerAppRoot "/home/u291922140/domains/medinexworld.com/public_html"
+PassengerBaseURI "/"
+PassengerNodejs "/opt/alt/alt-nodejs20/root/usr/bin/node"
+PassengerAppType node
+PassengerStartupFile server.js
+
+DirectoryIndex index.html index.php
+
+# Block access to default.php if it exists
+<Files "default.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protect sensitive files
+<FilesMatch "^\.env|\.env\.local|package\.json|package-lock\.json|\.sql$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
