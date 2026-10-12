@@ -1,0 +1,393 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  email              String    @unique @db.VarChar(255)
+  phone              String    @default("")
+  password           String
+  role               String    @default("patient")
+  isEmailVerified    Boolean   @default(true)
+  authOtpHash        String?   @db.Text
+  authOtpPurpose     String?
+  authOtpExpires     DateTime?
+  authOtpLastSentAt  DateTime?
+  authOtpAttempts    Int       @default(0)
+  authOtpLockedUntil DateTime?
+  locationLat        Float?
+  locationLng        Float?
+  walletBalance      Float     @default(0)
+  createdAt          DateTime  @default(now())
+
+  appointments   Appointment[] @relation("PatientAppointments")
+  reviews        Review[]      @relation("PatientReviews")
+  prescriptions  Prescription[]
+  transactions   Transaction[] @relation("UserTransactions")
+  ownedHospitals Hospital[]    @relation("HospitalOwner")
+  enquiries      Enquiry[]
+
+  @@map("users")
+}
+
+model Doctor {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  email              String    @unique @db.VarChar(255)
+  phone              String    @default("")
+  password           String
+  specialty          String
+  qual               String
+  exp                String
+  rating             Float     @default(0)
+  reviews            Int       @default(0)
+  fee                Float
+  videoFee           Float
+  platformFeePercent Float     @default(0)
+  distance           Float     @default(0)
+  image              String?     @db.Text
+  about              String?     @db.Text
+  address            String?     @db.Text
+  slots              Json      @default("[]")
+  weeklySchedule     Json      @default("[]")
+  availableSlots     Json      @default("[]")
+  videoAvailability  String    @default("always")
+  isOnlineNow        Boolean   @default(false)
+  isVerified         Boolean   @default(false)
+  verifiedAt         DateTime?
+  verifiedById       Int?
+  clinicPhotos       Json      @default("[]")
+  // Profile highlight stats shown on the public doctor page (editable by doctor and admin)
+  patientsTreated    String    @default("")
+  avgWaitTime        String    @default("")
+  hospitalId         Int?
+  authOtpHash        String?   @db.Text
+  authOtpPurpose     String?
+  authOtpExpires     DateTime?
+  authOtpLastSentAt  DateTime?
+  authOtpAttempts    Int       @default(0)
+  authOtpLockedUntil DateTime?
+  locationLat        Float?
+  locationLng        Float?
+  certificateUrl     String?     @db.Text
+  walletBalance      Float     @default(0)
+  totalPaidOut       Float     @default(0)
+  paymentLogs        Json      @default("[]")
+  createdAt          DateTime  @default(now())
+
+  hospital     Hospital?     @relation("HospitalDoctors", fields: [hospitalId], references: [id], onDelete: SetNull)
+  appointments Appointment[] @relation("DoctorAppointments")
+  chambers     DoctorChamber[]
+  reviewsRel   Review[]      @relation("DoctorReviews")
+  transactions Transaction[] @relation("DoctorTransactions")
+
+  @@map("doctors")
+}
+
+model Hospital {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  nameHi             String   @default("")
+  type               String
+  // What the facility is: "hospital" or "nursing_home" (type above is ownership: private/government/…)
+  facilityKind       String   @default("hospital")
+  phone              String   @default("")
+  email              String   @default("")
+  address            String   @db.Text
+  addressHi          String?    @db.Text
+  locationLat        Float?
+  locationLng        Float?
+  facilities         Json     @default("[]")
+  departments        Json     @default("[]")
+  photos             Json     @default("[]")
+  ownerId            Int?
+  associatedDoctors  Json     @default("[]")
+  labServices        Json     @default("[]")
+  surgeryServices    Json     @default("[]")
+  serviceSlots       Json     @default("[\"09:00 AM\",\"11:00 AM\",\"01:00 PM\",\"03:00 PM\",\"05:00 PM\",\"07:00 PM\"]")
+  medicineShop       Boolean  @default(false)
+  medicineDelivery   Boolean  @default(false)
+  walletBalance      Float    @default(0)
+  totalPaidOut       Float    @default(0)
+  paymentLogs        Json     @default("[]")
+  platformFeePercent Float    @default(0)
+  about              String?    @db.Text
+  aboutHi            String?    @db.Text
+  rating             Float    @default(0)
+  reviewCount        Int      @default(0)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  owner        User?         @relation("HospitalOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  doctors      Doctor[]      @relation("HospitalDoctors")
+  chambers     DoctorChamber[]
+  appointments Appointment[] @relation("HospitalAppointments")
+  reviewsRel   Review[]      @relation("HospitalReviews")
+
+  @@map("hospitals")
+}
+
+model Appointment {
+  id                  Int       @id @default(autoincrement())
+  patientId           Int
+  doctorId            Int?
+  hospitalId          Int?
+  serviceType         String    @default("doctor")
+  serviceName         String    @default("")
+  slot                String
+  date                String
+  type                String
+  status              String    @default("Confirmed")
+  price               Float     @default(0)
+  paidAmount          Float     @default(0)
+  basePrice           Float     @default(0)
+  gstAmount           Float     @default(0)
+  discountAmount      Float     @default(0)
+  platformFeePercent  Float     @default(0)
+  platformFeeAmount   Float     @default(0)
+  chamberId           Int?
+  chamberName         String?
+  chamberAddress      String?   @db.Text
+  visitDate           String?   @db.VarChar(10)
+  bookingFee          Float     @default(0)
+  bookingFeePaid      Boolean   @default(false)
+  paymentMethod       String    @default("cash")
+  paymentStatus       String    @default("pending")
+  razorpayOrderId     String?
+  razorpayPaymentId   String?
+  razorpaySignature   String?
+  reviewRating        Float?
+  reviewText          String?   @db.Text
+  reviewedAt          DateTime?
+  createdAt           DateTime  @default(now())
+
+  patient      User         @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor       Doctor?      @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: SetNull)
+  hospital     Hospital?    @relation("HospitalAppointments", fields: [hospitalId], references: [id], onDelete: SetNull)
+  chamber      DoctorChamber? @relation(fields: [chamberId], references: [id], onDelete: SetNull)
+  reviewsRel   Review[]
+  transactions Transaction[]
+  prescriptions Prescription[]
+
+  @@index([chamberId, visitDate])
+  @@map("appointments")
+}
+
+// A chamber is a place where a doctor sits on a recurring schedule.
+// scheduleType "weekly" uses weekDays (0 = Sunday … 6 = Saturday);
+// "monthly" uses monthDays (1–31, repeating every month).
+model DoctorChamber {
+  id            Int       @id @default(autoincrement())
+  doctorId      Int
+  // Set when the chamber is a doctor's sitting at a hospital / nursing home (managed from that facility's panel)
+  hospitalId    Int?
+  name          String
+  address       String    @db.Text
+  phone         String    @default("")
+  mapUrl        String?   @db.Text
+  locationLat   Float?
+  locationLng   Float?
+  fee           Float     @default(0)
+  scheduleType  String    @default("weekly")
+  weekDays      Json      @default("[]")
+  monthDays     Json      @default("[]")
+  startTime     String    @default("17:00") @db.VarChar(5)
+  endTime       String    @default("20:00") @db.VarChar(5)
+  slotDuration  Int       @default(15)
+  photos        Json      @default("[]")
+  isActive      Boolean   @default(true)
+  checkedInAt   DateTime?
+  checkedOutAt  DateTime?
+  checkInLat    Float?
+  checkInLng    Float?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  doctor       Doctor        @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  hospital     Hospital?     @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@index([doctorId])
+  @@index([hospitalId])
+  @@map("doctor_chambers")
+}
+
+model Transaction {
+  id             Int      @id @default(autoincrement())
+  userId         Int?
+  doctorId       Int?
+  ownerType      String
+  appointmentId  Int
+  amount         Float
+  type           String
+  paymentMethod  String
+  description    String?    @db.Text
+  createdAt      DateTime @default(now())
+
+  user        User?        @relation("UserTransactions", fields: [userId], references: [id], onDelete: SetNull)
+  doctor      Doctor?      @relation("DoctorTransactions", fields: [doctorId], references: [id], onDelete: SetNull)
+  appointment Appointment  @relation(fields: [appointmentId], references: [id])
+
+  @@unique([appointmentId, type, paymentMethod], name: "unique_credit_per_appointment")
+  @@map("transactions")
+}
+
+model Review {
+  id            Int      @id @default(autoincrement())
+  doctorId      Int?
+  hospitalId    Int?
+  patientId     Int?
+  patientName   String
+  rating        Float
+  text          String?    @db.Text
+  appointmentId Int?
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  doctor      Doctor?      @relation("DoctorReviews", fields: [doctorId], references: [id], onDelete: SetNull)
+  hospital    Hospital?    @relation("HospitalReviews", fields: [hospitalId], references: [id], onDelete: SetNull)
+  patient     User?        @relation("PatientReviews", fields: [patientId], references: [id], onDelete: SetNull)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@map("reviews")
+}
+
+model Prescription {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  type          String
+  title         String
+  doctorName    String   @default("")
+  hospitalName  String   @default("")
+  date          String
+  fileData      String   @db.LongText
+  fileType      String
+  notes         String?    @db.Text
+  appointmentId Int?
+  createdAt     DateTime @default(now())
+
+  user        User         @relation(fields: [userId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@map("prescriptions")
+}
+
+model Blog {
+  id          Int       @id @default(autoincrement())
+  title       String
+  titleHi     String    @default("")
+  slug        String    @unique
+  content     String    @db.LongText
+  contentHi   String?     @db.LongText
+  excerpt     String?     @db.Text
+  excerptHi   String?     @db.Text
+  coverImage  String?     @db.Text
+  author      String    @default("Medinex World")
+  tags        Json      @default("[]")
+  category    String    @default("health-tips")
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  viewCount   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("blogs")
+}
+
+model PendingRegistration {
+  id              Int       @id @default(autoincrement())
+  name            String
+  email           String    @unique @db.VarChar(255)
+  phone           String
+  password        String
+  otpHash         String
+  otpExpires      DateTime
+  otpLastSentAt   DateTime?
+  otpAttempts     Int       @default(0)
+  otpLockedUntil  DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("pending_registrations")
+}
+
+model PlatformSettings {
+  id                        Int      @id @default(autoincrement())
+  gstPercent                Float    @default(0)
+  discountAmount            Float    @default(0)
+  defaultPlatformFeePercent Float    @default(10)
+  chamberBookingFee         Float    @default(50)
+  supportEmail              String   @default("support@medinexworld.com")
+  supportPhone              String   @default("+91 98765 43210")
+  emergencyPhone            String   @default("112")
+  contactAddress            String?  @db.Text
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@map("platform_settings")
+}
+
+model Enquiry {
+  id               Int       @id @default(autoincrement())
+  userId           Int?
+  type             String    // "test_report" | "ambulance"
+  patientName      String
+  patientPhone     String
+  patientEmail     String?
+  city             String?
+
+  // Test Report specific
+  testName         String?
+  reportText       String?   @db.Text
+  fileData         String?   @db.LongText
+  fileType         String?
+  preferredDate    String?
+
+  // Ambulance specific
+  ambulanceType    String?   // "Basic Life Support (BLS)", "Advanced Life Support (ALS / ICU)", "Patient Transport", "Neonatal"
+  pickupAddress    String?   @db.Text
+  pickupLat        Float?
+  pickupLng        Float?
+  dropAddress      String?   @db.Text
+  urgency          String?   @default("emergency") // "emergency" | "scheduled"
+  scheduledTime    String?
+  patientCondition String?   @db.Text
+
+  // Admin Follow-up & Status
+  status           String    @default("pending") // "pending" | "in_progress" | "contacted" | "resolved" | "cancelled"
+  adminNotes       String?   @db.Text
+  followUpMessage  String?   @db.Text
+  followUpDate     DateTime?
+  followUpBy       String?
+  quoteAmount      Float?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user             User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("enquiries")
+}
+
+model Specialty {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(191)
+  description String?  @db.Text
+  icon        String?  @default("")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("specialties")
+}
+

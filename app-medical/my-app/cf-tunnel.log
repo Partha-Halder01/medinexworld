@@ -1,0 +1,72 @@
+2026-10-05T16:21:40Z INF Thank you for trying Cloudflare Tunnel. Doing so, without a Cloudflare account, is a quick way to experiment and try it out. However, be aware that these account-less Tunnels have no uptime guarantee, are subject to the Cloudflare Online Services Terms of Use (https://www.cloudflare.com/website-terms/), and Cloudflare reserves the right to investigate your use of Tunnels for violations of such terms. If you intend to use Tunnels in production you should use a pre-created named tunnel by following: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps
+2026-10-05T16:21:40Z INF Requesting new quick Tunnel on trycloudflare.com...
+2026-10-05T16:21:45Z INF +--------------------------------------------------------------------------------------------+
+2026-10-05T16:21:45Z INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
+2026-10-05T16:21:45Z INF |  https://does-casa-automatically-threatening.trycloudflare.com                             |
+2026-10-05T16:21:45Z INF +--------------------------------------------------------------------------------------------+
+2026-10-05T16:21:45Z INF Cannot determine default configuration path. No file [config.yml config.yaml] in [~/.cloudflared ~/.cloudflare-warp ~/cloudflare-warp]
+2026-10-05T16:21:45Z INF Version 2026.7.1 (Checksum ccb0756de288d3c2c076d19764ca53e0849a10f2dd9c23f8656ac42bdeb45001)
+2026-10-05T16:21:45Z INF GOOS: windows, GOVersion: go1.26.4, GoArch: amd64
+2026-10-05T16:21:45Z INF Settings: map[ha-connections:1 no-autoupdate:true protocol:quic url:http://localhost:3000]
+2026-10-05T16:21:45Z INF cloudflared will not automatically update on Windows systems.
+2026-10-05T16:21:45Z INF Generated Connector ID: e77358e3-0f7b-4395-b36e-bf4ce1144ebf
+2026-10-05T16:21:45Z INF Initial protocol quic
+2026-10-05T16:21:45Z INF ICMP proxy will use 10.32.41.87 as source for IPv4
+2026-10-05T16:21:45Z INF ICMP proxy will use 2409:40e0:1035:c6be:9778:e6ee:9d53:c77b in zone Wi-Fi as source for IPv6
+2026-10-05T16:21:45Z INF cloudflared does not support loading the system root certificate pool on Windows. Please use --origin-ca-pool <PATH> to specify the path to the certificate pool
+2026-10-05T16:21:45Z INF ICMP proxy will use 10.32.41.87 as source for IPv4
+2026-10-05T16:21:45Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveID(65074) CurveP256] connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:21:45Z INF ICMP proxy will use 2409:40e0:1035:c6be:9778:e6ee:9d53:c77b in zone Wi-Fi as source for IPv6
+2026-10-05T16:21:45Z INF Starting metrics server on 127.0.0.1:20241/metrics
+2026-10-05T16:21:46Z INF +-------------------------------------------------------------------------------------+
+2026-10-05T16:21:46Z INF |                               CONNECTIVITY PRE-CHECKS                               |
+2026-10-05T16:21:46Z INF +-------------------------------------------------------------------------------------+
+2026-10-05T16:21:46Z INF |  COMPONENT         TARGET                     STATUS  DETAILS                       |
+2026-10-05T16:21:46Z INF |  DNS Resolution    region1.v2.argotunnel.com  PASS    DNS Resolved successfully     |
+2026-10-05T16:21:46Z INF |  DNS Resolution    region2.v2.argotunnel.com  PASS    DNS Resolved successfully     |
+2026-10-05T16:21:46Z INF |  UDP Connectivity  region1.v2.argotunnel.com  PASS    QUIC connection successful    |
+2026-10-05T16:21:46Z INF |  UDP Connectivity  region2.v2.argotunnel.com  PASS    QUIC connection successful    |
+2026-10-05T16:21:46Z INF |  TCP Connectivity  region1.v2.argotunnel.com  PASS    HTTP/2 connection successful  |
+2026-10-05T16:21:46Z INF |  TCP Connectivity  region2.v2.argotunnel.com  PASS    HTTP/2 connection successful  |
+2026-10-05T16:21:46Z INF |  Cloudflare API    api.cloudflare.com:443     PASS    API is reachable              |
+2026-10-05T16:21:46Z INF |                                                                                     |
+2026-10-05T16:21:46Z INF |  SUMMARY: Environment is healthy. cloudflared will use 'quic' as primary protocol.  |
+2026-10-05T16:21:46Z INF +-------------------------------------------------------------------------------------+
+2026-10-05T16:21:46Z INF precheck component="DNS Resolution" details="DNS Resolved successfully" run_id=54905097-77b0-42f4-9c21-65a4992dfb46 status=pass target=region1.v2.argotunnel.com
+2026-10-05T16:21:46Z INF precheck component="DNS Resolution" details="DNS Resolved successfully" run_id=54905097-77b0-42f4-9c21-65a4992dfb46 status=pass target=region2.v2.argotunnel.com
+2026-10-05T16:21:46Z INF precheck component="UDP Connectivity" details="QUIC connection successful" run_id=54905097-77b0-42f4-9c21-65a4992dfb46 status=pass target=region1.v2.argotunnel.com
+2026-10-05T16:21:46Z INF precheck component="UDP Connectivity" details="QUIC connection successful" run_id=54905097-77b0-42f4-9c21-65a4992dfb46 status=pass target=region2.v2.argotunnel.com
+2026-10-05T16:21:46Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=54905097-77b0-42f4-9c21-65a4992dfb46 status=pass target=region1.v2.argotunnel.com
+2026-10-05T16:21:46Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=54905097-77b0-42f4-9c21-65a4992dfb46 status=pass target=region2.v2.argotunnel.com
+2026-10-05T16:21:46Z INF precheck component="Cloudflare API" details="API is reachable" run_id=54905097-77b0-42f4-9c21-65a4992dfb46 status=pass target=api.cloudflare.com:443
+2026-10-05T16:21:46Z INF precheck complete hard_fail=false run_id=54905097-77b0-42f4-9c21-65a4992dfb46 suggested_protocol=quic
+2026-10-05T16:21:46Z INF Registered tunnel connection connIndex=0 connection=f06aabc6-f409-42f3-bd42-615873908a25 event=0 ip=2606:4700:a8::2 location=del04 protocol=quic
+2026-10-05T16:30:50Z ERR failed to accept incoming stream requests error="failed to accept QUIC stream: timeout: no recent network activity" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:30:50Z ERR failed to run the datagram handler error="timeout: no recent network activity" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:30:50Z ERR failed to serve tunnel connection error="accept stream listener encountered a failure while serving" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:30:50Z ERR Serve tunnel error error="accept stream listener encountered a failure while serving" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:30:50Z INF Retrying connection in up to 1s connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:30:52Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveID(65074) CurveP256] connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:30:52Z INF Registered tunnel connection connIndex=0 connection=224340e2-faef-4250-957c-738797b7d080 event=0 ip=2606:4700:a8::2 location=del04 protocol=quic
+2026-10-05T16:36:13Z ERR failed to accept incoming stream requests error="failed to accept QUIC stream: timeout: no recent network activity" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:36:13Z ERR failed to run the datagram handler error="timeout: no recent network activity" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:36:13Z ERR failed to serve tunnel connection error="accept stream listener encountered a failure while serving" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:36:13Z ERR Serve tunnel error error="accept stream listener encountered a failure while serving" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:36:13Z INF Retrying connection in up to 1s connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:36:14Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveID(65074) CurveP256] connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T16:36:16Z INF Registered tunnel connection connIndex=0 connection=7b1b73f7-0bf2-468b-9501-35c3e10b6dcc event=0 ip=2606:4700:a8::2 location=del04 protocol=quic
+2026-10-05T16:56:59Z ERR  error="Incoming request ended abruptly: context canceled" connIndex=0 event=1 ingressRule=0 originService=http://localhost:3000
+2026-10-05T16:56:59Z ERR Request failed error="Incoming request ended abruptly: context canceled" connIndex=0 dest=https://does-casa-automatically-threatening.trycloudflare.com/api/doctors event=0 ip=2606:4700:a8::2 type=http
+2026-10-05T18:15:10Z ERR  error="Incoming request ended abruptly: context canceled" connIndex=0 event=1 ingressRule=0 originService=http://localhost:3000
+2026-10-05T18:15:10Z ERR Request failed error="Incoming request ended abruptly: context canceled" connIndex=0 dest=https://does-casa-automatically-threatening.trycloudflare.com/api/doctors?lat=24.0946514&lng=88.2547804 event=0 ip=2606:4700:a8::2 type=http
+2026-10-05T18:15:17Z ERR  error="Incoming request ended abruptly: context canceled" connIndex=0 event=1 ingressRule=0 originService=http://localhost:3000
+2026-10-05T18:15:17Z ERR Request failed error="Incoming request ended abruptly: context canceled" connIndex=0 dest=https://does-casa-automatically-threatening.trycloudflare.com/api/doctors event=0 ip=2606:4700:a8::2 type=http
+2026-10-05T18:29:31Z INF Initiating graceful shutdown due to signal terminated ...
+2026-10-05T18:29:31Z ERR failed to run the datagram handler error="Application error 0x0 (remote)" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T18:29:31Z ERR failed to serve tunnel connection error="accept stream listener encountered a failure while serving" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T18:29:31Z ERR Serve tunnel error error="accept stream listener encountered a failure while serving" connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T18:29:31Z INF Retrying connection in up to 1s connIndex=0 event=0 ip=2606:4700:a8::2
+2026-10-05T18:29:31Z ERR Connection terminated connIndex=0
+2026-10-05T18:29:31Z ERR no more connections active and exiting
+2026-10-05T18:29:31Z INF Tunnel server stopped
+2026-10-05T18:29:31Z INF Metrics server stopped
