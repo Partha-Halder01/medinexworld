@@ -58,7 +58,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (isNaN(numId)) return NextResponse.json({ error: 'Invalid appointment id.' }, { status: 400 });
 
     const body = await req.json();
-    const { patientName, patientAge, patientGender, patientId } = body;
+    const { patientName, patientAge, patientGender, patientId, settlementStatus, settlementRef, settledBy } = body;
 
     const where: any = { id: numId };
     if (patientId) where.patientId = parseInt(patientId, 10);
@@ -72,6 +72,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
     if (patientGender !== undefined) {
       data.patientGender = typeof patientGender === 'string' && patientGender.trim() ? patientGender.trim() : null;
+    }
+    if (settlementStatus !== undefined) {
+      data.settlementStatus = settlementStatus;
+      if (settlementStatus === 'settled') {
+        data.settledAt = new Date();
+        data.settledBy = settledBy || 'Admin';
+      } else if (settlementStatus === 'pending') {
+        data.settledAt = null;
+        data.settledBy = null;
+      }
+    }
+    if (settlementRef !== undefined) {
+      data.settlementRef = typeof settlementRef === 'string' ? settlementRef.trim() : null;
     }
 
     const updated = await prisma.appointment.update({

@@ -167,6 +167,12 @@ model Appointment {
   patientGender       String?
   bookingFee          Float     @default(0)
   bookingFeePaid      Boolean   @default(false)
+  paymentOption       String?   @default("partial")
+  settlementStatus    String?   @default("not_applicable")
+  settledAt           DateTime?
+  settledBy           String?
+  doctorPayoutAmount  Float?    @default(0)
+  settlementRef       String?
   paymentMethod       String    @default("cash")
   paymentStatus       String    @default("pending")
   razorpayOrderId     String?

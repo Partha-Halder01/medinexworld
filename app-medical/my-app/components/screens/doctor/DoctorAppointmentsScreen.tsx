@@ -99,6 +99,7 @@ export const DoctorAppointmentsScreen = () => {
 
   const paymentMethodOf = (apt: any) => (apt.paymentMethod || 'cash').toLowerCase();
   const paymentLabel = (apt: any) => {
+    if (apt.paymentOption === 'full' && apt.paymentStatus === 'paid') return 'Full Paid Online';
     const m = paymentMethodOf(apt);
     if (m === 'chamber') return apt.paymentStatus === 'paid' ? 'Collected' : 'At Chamber';
     return m === 'online' ? 'Online' : 'Cash';
@@ -263,19 +264,40 @@ export const DoctorAppointmentsScreen = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${paymentMethodOf(apt) === 'online' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
-                        {paymentMethodOf(apt) === 'online' ? <CreditCard size={12} /> : <Wallet size={12} />}
-                        {paymentLabel(apt)}
-                      </span>
+                      {apt.paymentOption === 'full' && apt.paymentStatus === 'paid' ? (
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                            <CreditCard size={12} /> Full Paid Online
+                          </span>
+                          <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                            ✓ No cash to collect
+                          </p>
+                        </div>
+                      ) : (
+                        <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${paymentMethodOf(apt) === 'online' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                          {paymentMethodOf(apt) === 'online' ? <CreditCard size={12} /> : <Wallet size={12} />}
+                          {paymentLabel(apt)}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">
                         <IndianRupee size={14} />
                         {amountFor(apt).toLocaleString('en-IN')}
                       </span>
-                      {paymentMethodOf(apt) === 'chamber' && apt.paymentStatus !== 'paid' && (
-                        <p className="text-[10px] text-gray-400 mt-0.5">collect at chamber</p>
-                      )}
+                      {apt.paymentOption === 'full' && apt.paymentStatus === 'paid' ? (
+                        <div className="mt-1">
+                          <span className={`inline-flex items-center text-[10px] font-black px-1.5 py-0.5 rounded ${
+                            apt.settlementStatus === 'settled'
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                          }`}>
+                            {apt.settlementStatus === 'settled' ? 'Admin Settled ✓' : 'Admin Payout Pending'}
+                          </span>
+                        </div>
+                      ) : paymentMethodOf(apt) === 'chamber' && apt.paymentStatus !== 'paid' ? (
+                        <p className="text-[10px] text-amber-600 dark:text-amber-400 font-bold mt-0.5">collect at chamber</p>
+                      ) : null}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${statusBadge(apt.status)}`}>
@@ -379,18 +401,33 @@ export const DoctorAppointmentsScreen = () => {
                       {apt.type === 'video' ? <Video size={11} /> : <MapPin size={11} />}
                       {apt.type === 'video' ? 'Video' : 'Clinic'}
                     </span>
-                    <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
-                      paymentMethodOf(apt) === 'online'
-                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
-                        : 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
-                    }`}>
-                      {paymentMethodOf(apt) === 'online' ? <CreditCard size={11} /> : <Wallet size={11} />}
-                      {paymentLabel(apt)}
-                    </span>
+                    {apt.paymentOption === 'full' && apt.paymentStatus === 'paid' ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                        <CreditCard size={11} /> Full Paid Online
+                      </span>
+                    ) : (
+                      <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
+                        paymentMethodOf(apt) === 'online'
+                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
+                      }`}>
+                        {paymentMethodOf(apt) === 'online' ? <CreditCard size={11} /> : <Wallet size={11} />}
+                        {paymentLabel(apt)}
+                      </span>
+                    )}
                     <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
                       <IndianRupee size={11} />
                       {amountFor(apt).toLocaleString('en-IN')}
                     </span>
+                    {apt.paymentOption === 'full' && apt.paymentStatus === 'paid' && (
+                      <span className={`inline-flex items-center text-[10px] font-black px-2 py-0.5 rounded-full ${
+                        apt.settlementStatus === 'settled'
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      }`}>
+                        {apt.settlementStatus === 'settled' ? 'Admin Settled ✓' : 'Payout Pending'}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap gap-1.5">

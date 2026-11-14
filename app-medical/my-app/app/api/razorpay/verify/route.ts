@@ -50,20 +50,52 @@ export async function POST(req: Request) {
     if (payment.status !== 'captured' && payment.status !== 'authorized') return NextResponse.json({ error: 'Payment not successful.' }, { status: 400 });
 
     if (appointment.paymentMethod === 'chamber') {
-      // Booking fee is platform revenue; the consultation fee stays pending until it is paid at the chamber.
+      const isFull = appointment.paymentOption === 'full';
       await prisma.appointment.update({
         where: { id: apptId },
-        data: { bookingFeePaid: true, razorpayPaymentId: razorpay_payment_id, razorpaySignature: razorpay_signature },
+        data: { 
+          bookingFeePaid: true, 
+          paymentStatus: isFull ? 'paid' : 'pending',
+          settlementStatus: isFull ? 'pending' : 'not_applicable',
+          razorpayPaymentId: razorpay_payment_id, 
+          razorpaySignature: razorpay_signature 
+        },
       });
+
+      // If full payment, record doctor transaction credit and wallet balance
+      if (isFull && appointment.doctorId && appointment.doctorPayoutAmount && appointment.doctorPayoutAmount > 0) {
+        const payout = Number(appointment.doctorPayoutAmount);
+        const existingCredit = await prisma.transaction.findFirst({
+          where: { appointmentId: apptId, paymentMethod: 'online', type: 'credit' },
+        });
+        if (!existingCredit) {
+          await prisma.doctor.update({ where: { id: appointment.doctorId }, data: { walletBalance: { increment: payout } } });
+          await prisma.transaction.create({
+            data: { 
+              doctorId: appointment.doctorId, 
+              ownerType: 'Doctor', 
+              appointmentId: apptId, 
+              amount: payout, 
+              type: 'credit', 
+              paymentMethod: 'online', 
+              description: `Chamber visit full payment online for Patient ${appointment.patientName || ''} (Admin payout pending)` 
+            },
+          });
+        }
+      }
+
       return NextResponse.json({ success: true });
     }
 
-    const isCashSettlement = appointment.paymentMethod === 'cash';
+    const isFullPayment = appointment.paymentOption === 'full';
+    const isCashSettlement = !isFullPayment && appointment.paymentMethod === 'cash';
+
     await prisma.appointment.update({
       where: { id: apptId },
       data: {
         paymentStatus: isCashSettlement ? 'pending' : 'paid',
         bookingFeePaid: true,
+        settlementStatus: isFullPayment ? 'pending' : 'not_applicable',
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
       },

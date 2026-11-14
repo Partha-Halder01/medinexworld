@@ -11,37 +11,56 @@ const getRazorpayClient = () => {
 
 export async function POST(req: Request) {
   try {
-    const { appointmentId, paymentMethod, patientId } = await req.json();
+    const { appointmentId, paymentMethod, patientId, paymentOption } = await req.json();
 
     const apptId = parseInt(appointmentId, 10);
     const pId = parseInt(patientId, 10);
     if (isNaN(apptId) || isNaN(pId)) return NextResponse.json({ error: 'Invalid appointment or patient id.' }, { status: 400 });
-    if (paymentMethod !== 'online' && paymentMethod !== 'cash') return NextResponse.json({ error: 'Invalid payment method.' }, { status: 400 });
+    if (paymentMethod && paymentMethod !== 'online' && paymentMethod !== 'cash') return NextResponse.json({ error: 'Invalid payment method.' }, { status: 400 });
 
-    const normalizedPaymentMethod: 'online' | 'cash' = paymentMethod;
+    const isFullPayment = paymentOption === 'full';
     const appointment = await prisma.appointment.findUnique({ where: { id: apptId } });
     if (!appointment) return NextResponse.json({ error: 'Appointment not found.' }, { status: 404 });
     if (appointment.patientId !== pId) return NextResponse.json({ error: 'Unauthorized for this appointment.' }, { status: 403 });
     if (appointment.status !== 'Confirmed') return NextResponse.json({ error: 'Payment allowed only for confirmed appointments.' }, { status: 400 });
     if (appointment.paymentStatus === 'paid') return NextResponse.json({ error: 'Appointment is already paid.' }, { status: 409 });
 
-    // Chamber booking: only the flat platform booking fee is collected online.
+    // Chamber booking
     if (appointment.paymentMethod === 'chamber') {
-      if (appointment.bookingFeePaid) return NextResponse.json({ error: 'Booking fee is already paid.' }, { status: 409 });
+      if (appointment.bookingFeePaid && !isFullPayment) {
+        return NextResponse.json({ error: 'Booking fee is already paid.' }, { status: 409 });
+      }
       const bookingFee = Math.max(0, Math.round(Number(appointment.bookingFee) || 0));
-      if (bookingFee <= 0) {
+      const consultFee = Math.max(0, Math.round(Number(appointment.basePrice || appointment.price) || 0));
+      
+      const payableAmount = isFullPayment ? (bookingFee + consultFee) : bookingFee;
+      if (payableAmount <= 0) {
         return NextResponse.json({ error: 'No online payment required for this booking.' }, { status: 400 });
       }
+
       const razorpay = getRazorpayClient();
       const order = await razorpay.orders.create({
-        amount: bookingFee * 100,
+        amount: Math.round(payableAmount * 100),
         currency: 'INR',
         receipt: String(apptId),
-        notes: { appointmentId: String(apptId), patientId: String(pId), purpose: 'chamber_booking_fee' },
+        notes: { 
+          appointmentId: String(apptId), 
+          patientId: String(pId), 
+          purpose: isFullPayment ? 'chamber_full_payment' : 'chamber_booking_fee',
+          paymentOption: isFullPayment ? 'full' : 'partial',
+        },
       });
+
       await prisma.appointment.update({
         where: { id: apptId },
-        data: { razorpayOrderId: order.id, paidAmount: bookingFee, platformFeeAmount: bookingFee },
+        data: { 
+          razorpayOrderId: order.id, 
+          paidAmount: payableAmount, 
+          platformFeeAmount: bookingFee,
+          doctorPayoutAmount: isFullPayment ? consultFee : 0,
+          paymentOption: isFullPayment ? 'full' : 'partial',
+          settlementStatus: isFullPayment ? 'pending' : 'not_applicable',
+        },
       });
       return NextResponse.json({ id: order.id, amount: order.amount, currency: order.currency });
     }
@@ -59,9 +78,9 @@ export async function POST(req: Request) {
     const platformFeeAmount = Math.round((basePrice * platformFeePercent) / 100);
     const fullPrice = Math.max(0, basePrice + gstAmount + platformFeeAmount - discountAmount);
 
-    // Online payment is ONLY for the platform fee (+ GST - discount).
-    // The consultation fee is paid directly at the clinic / hospital.
-    const onlinePayableAmount = Math.max(0, gstAmount + platformFeeAmount - discountAmount);
+    const onlinePayableAmount = isFullPayment 
+      ? fullPrice 
+      : Math.max(0, gstAmount + platformFeeAmount - discountAmount);
 
     if (onlinePayableAmount <= 0) {
       return NextResponse.json({ error: 'No online payment required for this booking. Please use the cash confirmation flow.' }, { status: 400 });
@@ -72,14 +91,19 @@ export async function POST(req: Request) {
       amount: Math.round(onlinePayableAmount * 100),
       currency: 'INR',
       receipt: String(apptId),
-      notes: { appointmentId: String(apptId), patientId: String(pId), purpose: 'platform_fee' },
+      notes: { 
+        appointmentId: String(apptId), 
+        patientId: String(pId), 
+        purpose: isFullPayment ? 'full_consult_payment' : 'platform_fee',
+        paymentOption: isFullPayment ? 'full' : 'partial',
+      },
     });
 
     await prisma.appointment.update({
       where: { id: apptId },
       data: {
         razorpayOrderId: order.id,
-        paymentMethod: 'cash',
+        paymentMethod: isFullPayment ? 'online' : 'cash',
         paymentStatus: 'pending',
         price: fullPrice,
         paidAmount: onlinePayableAmount,
@@ -88,6 +112,9 @@ export async function POST(req: Request) {
         platformFeeAmount,
         platformFeePercent,
         discountAmount,
+        paymentOption: isFullPayment ? 'full' : 'partial',
+        doctorPayoutAmount: isFullPayment ? basePrice : 0,
+        settlementStatus: isFullPayment ? 'pending' : 'not_applicable',
       },
     });
 

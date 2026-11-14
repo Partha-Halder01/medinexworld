@@ -234,8 +234,12 @@ export const AppointmentsScreen = () => {
                   </div>
                   {isChamberVisit ? (
                     <div className="text-right">
-                      <span className="text-base sm:text-lg font-black text-gray-900 dark:text-white">₹{apt.basePrice}</span>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase">at chamber</p>
+                      <span className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
+                        ₹{apt.paymentOption === 'full' && apt.paymentStatus === 'paid' ? (apt.paidAmount || apt.price || apt.basePrice) : apt.basePrice}
+                      </span>
+                      <p className={`text-[10px] font-bold uppercase ${apt.paymentOption === 'full' && apt.paymentStatus === 'paid' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                        {apt.paymentOption === 'full' && apt.paymentStatus === 'paid' ? 'Full Paid Online' : 'at chamber'}
+                      </p>
                     </div>
                   ) : apt.price > 0 && (
                     <div className="text-right">
@@ -285,10 +289,18 @@ export const AppointmentsScreen = () => {
                     </div>
                     <div className="flex items-center justify-between text-xs pt-1 border-t border-teal-100 dark:border-teal-900/50">
                       <span className="text-gray-500 dark:text-gray-400">
-                        {apt.bookingFee > 0 ? `Booking fee ₹${apt.bookingFee} paid online` : 'Free booking'}
+                        {apt.paymentOption === 'full' && apt.paymentStatus === 'paid'
+                          ? `Full amount ₹${apt.paidAmount || apt.price} paid online`
+                          : apt.bookingFee > 0 ? `Booking fee ₹${apt.bookingFee} paid online` : 'Free booking'}
                       </span>
                       <span className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
-                        <Wallet size={12} /> {apt.paymentStatus === 'paid' ? 'Settled' : `Pay ₹${apt.basePrice} at chamber`}
+                        {apt.paymentOption === 'full' && apt.paymentStatus === 'paid' ? (
+                          <span className="text-emerald-600 font-extrabold flex items-center gap-1">
+                            ✓ Zero to pay at chamber
+                          </span>
+                        ) : (
+                          <><Wallet size={12} /> {apt.paymentStatus === 'paid' ? 'Settled' : `Pay ₹${apt.basePrice} at chamber`}</>
+                        )}
                       </span>
                     </div>
                   </div>

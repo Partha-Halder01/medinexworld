@@ -55,6 +55,7 @@ export default function CheckoutClient() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failed'>('idle');
+  const [paymentChoice, setPaymentChoice] = useState<'full' | 'partial'>('full');
 
   const [switchingPatient, setSwitchingPatient] = useState(false);
 
@@ -254,11 +255,17 @@ export default function CheckoutClient() {
   // Discount
   const discountAmount = isChamberBooking ? 0 : Number(platformSettings?.discountAmount || 0);
 
-  // ONLY Platform Fee (+ GST - Discount) is payable online.
-  // Full consultation fee option is removed — consultation fee is paid at clinic on visit.
-  const onlinePayableAmount = isChamberBooking
+  // Full Total Amount (Doctor Consultation + Platform Fee + GST - Discount)
+  const fullPayableTotal = Math.max(0, consultationFee + platformFeeAmount + gstAmount - discountAmount);
+
+  // Partial Platform Fee Amount
+  const partialPayableFee = isChamberBooking
     ? (appointment?.bookingFeePaid ? 0 : platformFeeAmount)
     : Math.max(0, platformFeeAmount + gstAmount - discountAmount);
+
+  // Dynamic online payable amount based on user selection ('full' vs 'partial')
+  const onlinePayableAmount = paymentChoice === 'full' ? fullPayableTotal : partialPayableFee;
+  const clinicPayableAmount = paymentChoice === 'full' ? 0 : consultationFee;
 
   const handleOnlinePayment = async () => {
     setProcessing(true);
@@ -276,13 +283,14 @@ export default function CheckoutClient() {
     }
 
     try {
-      // Create Razorpay order on server for platform fee
+      // Create Razorpay order on server
       const orderRes = await fetch('/api/razorpay/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           appointmentId: checkoutId,
-          paymentMethod: 'cash', // Platform fee payment only; consultation settled at clinic
+          paymentMethod: paymentChoice === 'full' ? 'online' : 'cash',
+          paymentOption: paymentChoice,
           patientId: currentUser?._id,
         }),
       });
@@ -303,9 +311,11 @@ export default function CheckoutClient() {
         key: publicKey,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'UpcharPath',
+        name: 'Medinex World',
         image: '/newlogos.png',
-        description: `Platform booking fee for ${appointment.serviceName || (appointment.doctorId?.name ? formatDoctorName(appointment.doctorId.name) : 'Doctor Consultation')}`,
+        description: paymentChoice === 'full'
+          ? `Full consultation payment for ${appointment.serviceName || (appointment.doctorId?.name ? formatDoctorName(appointment.doctorId.name) : 'Doctor Consultation')}`
+          : `Platform booking fee for ${appointment.serviceName || (appointment.doctorId?.name ? formatDoctorName(appointment.doctorId.name) : 'Doctor Consultation')}`,
         order_id: orderData.id,
         handler: async (response: any) => {
           // Verify payment on server
@@ -325,7 +335,12 @@ export default function CheckoutClient() {
             setPaymentStatus('success');
             await fetchAppointments();
             setTimeout(() => {
-              showToast('Platform fee paid! Booking confirmed.', 'success');
+              showToast(
+                paymentChoice === 'full'
+                  ? 'Full payment received! Nothing to pay at clinic.'
+                  : 'Platform fee paid! Booking confirmed.',
+                'success'
+              );
               router.push('/appointments');
             }, 2500);
           } else {
@@ -476,7 +491,13 @@ export default function CheckoutClient() {
 
                 <div className="bg-slate-50 dark:bg-slate-800/80 w-full p-4.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 text-left space-y-2">
                   <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 font-semibold leading-relaxed">
-                    {onlinePayableAmount > 0 ? (
+                    {paymentChoice === 'full' ? (
+                      <>
+                        <span className="text-emerald-600 font-black">✓ Full payment of ₹{onlinePayableAmount} paid online!</span>
+                        <br />
+                        Doctor consultation and booking fees are 100% cleared. Nothing to pay at the clinic / chamber reception.
+                      </>
+                    ) : onlinePayableAmount > 0 ? (
                       <>
                         <span className="text-emerald-600 font-black">✓ Platform fee paid online (₹{onlinePayableAmount}).</span>
                         <br />
@@ -794,89 +815,139 @@ export default function CheckoutClient() {
 
             {/* ========================================================
                 RIGHT COLUMN: Transparent Fee & Payment Structure
-                (Full Payment Option REMOVED — Only Platform Fee Exists)
+                (Full Payment Option & Split Payment Option)
                 ======================================================== */}
             <div className="lg:col-span-5 space-y-5 animate-slide-up delay-200">
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col h-full relative">
                 
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Payment Schedule
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Choose Payment Option
                     </h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mt-1">
-                      Direct clinic pay model
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mt-0.5">
+                      Select how you would like to pay
                     </p>
                   </div>
                   <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-200/80 dark:border-emerald-900/60">
-                    <ShieldCheck size={12} className="text-emerald-500" /> Verified
+                    <ShieldCheck size={12} className="text-emerald-500" /> 100% Secure
                   </span>
                 </div>
 
-                {/* Split Payment Visual Cards */}
+                {/* Interactive Payment Choice Cards */}
                 <div className="space-y-3 mb-5">
                   
-                  {/* Card 1: Pay Online Now (Platform / Booking Fee) */}
-                  <div className="relative p-4 rounded-2xl border-2 border-teal-500/80 bg-gradient-to-br from-teal-50/70 via-cyan-50/30 to-white dark:from-teal-950/30 dark:via-cyan-950/20 dark:to-slate-800/80 shadow-xs">
+                  {/* Card 1: Pay Full Amount Online (Recommended) */}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setPaymentChoice('full')}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPaymentChoice('full'); }}
+                    className={`relative p-4.5 rounded-2xl border-2 transition-all cursor-pointer text-left ${
+                      paymentChoice === 'full'
+                        ? 'border-emerald-500 bg-gradient-to-br from-emerald-50/90 via-teal-50/30 to-white dark:from-emerald-950/40 dark:via-teal-950/20 dark:to-slate-850 shadow-md ring-2 ring-emerald-500/20'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850/60 hover:border-slate-300 dark:hover:border-slate-700 opacity-90 hover:opacity-100'
+                    }`}
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-xs ${
+                          paymentChoice === 'full' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                        }`}>
                           <Zap size={20} fill="currentColor" strokeWidth={1.5} />
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-sm font-black text-slate-900 dark:text-white">Pay Online Now</span>
-                            <span className="text-[10px] font-extrabold text-teal-700 dark:text-teal-300 bg-teal-100/80 dark:bg-teal-900/60 px-2 py-0.5 rounded-full">
-                              {onlinePayableAmount > 0 ? 'Platform Fee' : 'Free Booking'}
+                            <span className="text-sm font-black text-slate-900 dark:text-white">Pay Full Amount Online</span>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded-full">
+                              Recommended
                             </span>
                           </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 leading-snug">
-                            {onlinePayableAmount > 0
-                              ? 'Slot reservation & platform fee via UPI, Cards'
-                              : 'No online payment required to book slot'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-xl sm:text-2xl font-black text-teal-600 dark:text-teal-400 flex items-center justify-end leading-none">
-                          <IndianRupee size={18} strokeWidth={2.5} className="mr-0.5 opacity-80" />
-                          {onlinePayableAmount}
-                        </span>
-                        <span className="text-[10px] font-bold text-teal-600/80 dark:text-teal-400/80 block mt-1">
-                          {onlinePayableAmount > 0 ? 'Due Today' : 'Zero Fee'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 2: Pay at Clinic on Visit (Consultation Fee) */}
-                  <div className="relative p-4 rounded-2xl border border-emerald-200/90 dark:border-emerald-800/60 bg-gradient-to-br from-emerald-50/60 via-teal-50/20 to-white dark:from-emerald-950/20 dark:via-teal-950/10 dark:to-slate-800/80 shadow-xs">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                          <Wallet size={20} />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-sm font-black text-slate-900 dark:text-white">Pay at Clinic / Hospital</span>
-                            <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-900/60 px-2 py-0.5 rounded-full">
-                              On Visit
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 leading-snug">
-                            Doctor consultation fee — pay directly at reception (Cash / UPI)
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 leading-snug">
+                            Pay complete ₹{fullPayableTotal} online now. <strong className="text-emerald-600 dark:text-emerald-400 font-bold">Zero payment needed at chamber reception.</strong>
                           </p>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 flex items-center justify-end leading-none">
                           <IndianRupee size={18} strokeWidth={2.5} className="mr-0.5 opacity-80" />
-                          {consultationFee}
+                          {fullPayableTotal}
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-600/80 dark:text-emerald-400/80 block mt-1">
-                          Consult Fee
+                        <span className="text-[10px] font-bold text-emerald-600/90 dark:text-emerald-400/90 block mt-1">
+                          Full Clearance
                         </span>
                       </div>
+                    </div>
+
+                    <div className="mt-3 pt-2.5 border-t border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold">
+                      <span className={`inline-flex items-center gap-1.5 text-xs ${paymentChoice === 'full' ? 'text-emerald-700 dark:text-emerald-300 font-bold' : 'text-slate-400'}`}>
+                        <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] font-black ${
+                          paymentChoice === 'full' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 dark:border-slate-600'
+                        }`}>
+                          {paymentChoice === 'full' ? '✓' : ''}
+                        </span>
+                        Doctor consultation + platform fee 100% paid
+                      </span>
+                      {paymentChoice === 'full' && (
+                        <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">Selected</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card 2: Pay Platform Fee Online (Rest at Chamber) */}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setPaymentChoice('partial')}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPaymentChoice('partial'); }}
+                    className={`relative p-4.5 rounded-2xl border-2 transition-all cursor-pointer text-left ${
+                      paymentChoice === 'partial'
+                        ? 'border-teal-500 bg-gradient-to-br from-teal-50/90 via-cyan-50/30 to-white dark:from-teal-950/40 dark:via-cyan-950/20 dark:to-slate-850 shadow-md ring-2 ring-teal-500/20'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850/60 hover:border-slate-300 dark:hover:border-slate-700 opacity-90 hover:opacity-100'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-xs ${
+                          paymentChoice === 'partial' ? 'bg-teal-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                        }`}>
+                          <Wallet size={20} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-sm font-black text-slate-900 dark:text-white">Pay Platform Fee Only</span>
+                            <span className="text-[10px] font-extrabold text-teal-700 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/60 px-2 py-0.5 rounded-full">
+                              Split Pay
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 leading-snug">
+                            Pay ₹{partialPayableFee} platform fee online now. Pay doctor fee of ₹{consultationFee} directly at clinic reception.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-xl sm:text-2xl font-black text-teal-600 dark:text-teal-400 flex items-center justify-end leading-none">
+                          <IndianRupee size={18} strokeWidth={2.5} className="mr-0.5 opacity-80" />
+                          {partialPayableFee}
+                        </span>
+                        <span className="text-[10px] font-bold text-teal-600/80 dark:text-teal-400/80 block mt-1">
+                          Due Today
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 pt-2.5 border-t border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold">
+                      <span className={`inline-flex items-center gap-1.5 text-xs ${paymentChoice === 'partial' ? 'text-teal-700 dark:text-teal-300 font-bold' : 'text-slate-400'}`}>
+                        <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] font-black ${
+                          paymentChoice === 'partial' ? 'border-teal-600 bg-teal-600 text-white' : 'border-slate-300 dark:border-slate-600'
+                        }`}>
+                          {paymentChoice === 'partial' ? '✓' : ''}
+                        </span>
+                        Pay ₹{consultationFee} at chamber reception
+                      </span>
+                      {paymentChoice === 'partial' && (
+                        <span className="text-[11px] font-black text-teal-600 dark:text-teal-400">Selected</span>
+                      )}
                     </div>
                   </div>
 
@@ -888,7 +959,13 @@ export default function CheckoutClient() {
                     <span className="font-bold text-slate-500 dark:text-slate-400">Doctor Consultation Fee</span>
                     <span className="font-extrabold text-slate-800 dark:text-slate-200 flex items-center">
                       <IndianRupee size={13} /> {consultationFee}
-                      <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 ml-1.5">(at clinic)</span>
+                      <span className={`text-[10px] font-bold ml-1.5 px-2 py-0.5 rounded-full ${
+                        paymentChoice === 'full'
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                      }`}>
+                        {paymentChoice === 'full' ? 'Paying Online Now' : 'Pay at Chamber'}
+                      </span>
                     </span>
                   </div>
 
@@ -926,9 +1003,13 @@ export default function CheckoutClient() {
                   {/* Highlighted Total Due Now Box */}
                   <div className="p-4 rounded-2xl bg-slate-900 dark:bg-slate-950 text-white mt-4 flex items-center justify-between shadow-md">
                     <div>
-                      <span className="text-[10px] font-black uppercase tracking-wider text-teal-300">Total Payable Online</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-teal-300">
+                        {paymentChoice === 'full' ? 'Total Payable Online (100% Cleared)' : 'Total Payable Online Today'}
+                      </span>
                       <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                        {onlinePayableAmount > 0 ? 'Platform fee to hold your appointment' : 'Zero booking fee required'}
+                        {paymentChoice === 'full'
+                          ? 'Doctor consultation fee + platform booking fee'
+                          : 'Platform fee to reserve your confirmed slot'}
                       </p>
                     </div>
                     <div className="text-right">
@@ -936,6 +1017,16 @@ export default function CheckoutClient() {
                         <IndianRupee size={22} strokeWidth={2.5} className="mr-0.5 text-teal-400" />
                         {onlinePayableAmount}
                       </span>
+                      {paymentChoice === 'partial' && (
+                        <span className="text-[10px] font-extrabold text-amber-300 block mt-1">
+                          + ₹{consultationFee} at chamber
+                        </span>
+                      )}
+                      {paymentChoice === 'full' && (
+                        <span className="text-[10px] font-bold text-emerald-400 block mt-1">
+                          ₹0 at chamber
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -977,7 +1068,9 @@ export default function CheckoutClient() {
                         <Zap size={20} fill="currentColor" strokeWidth={1.5} className="shrink-0" />
                         <span>
                           {onlinePayableAmount > 0
-                            ? `Pay ₹${onlinePayableAmount} Platform Fee & Confirm`
+                            ? paymentChoice === 'full'
+                              ? `Pay ₹${onlinePayableAmount} Full Payment & Confirm`
+                              : `Pay ₹${onlinePayableAmount} Platform Fee & Confirm`
                             : 'Confirm Booking (Free)'}
                         </span>
                       </>
