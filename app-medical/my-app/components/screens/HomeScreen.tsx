@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import {
   Activity, Baby, Bot, Brain, Clock3, Heart, MapPin,
   Navigation, Smile, Sparkles, Stethoscope, Syringe,
   User, Video, ChevronRight, CalendarDays, ArrowRight,
   Building2, Search, Star, ShieldCheck, FileText, CheckCircle2,
-  Stethoscope as StethoscopeIcon, PhoneCall, Siren, FlaskConical, X, Mail
+  Stethoscope as StethoscopeIcon, PhoneCall, Siren, FlaskConical, X, Mail,
+  Pill, Truck, PackageCheck
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/app/context/AppContext';
@@ -16,6 +18,7 @@ import { BlogCard } from '../ui/BlogCard';
 import { BrandLogo } from '../ui/BrandLogo';
 import { TestReportEnquiryModal } from '@/components/screens/enquiry/TestReportEnquiryModal';
 import { AmbulanceEnquiryModal } from '@/components/screens/enquiry/AmbulanceEnquiryModal';
+import { MedicineDeliveryModal } from '@/components/screens/enquiry/MedicineDeliveryModal';
 import { SPECIALTIES } from '@/lib/data';
 import Link from 'next/link';
 
@@ -84,6 +87,7 @@ export const HomeScreen = () => {
   const [doctorTab, setDoctorTab] = useState<'all' | 'online' | 'nearby'>('all');
   const [showTestModal, setShowTestModal] = useState(false);
   const [showAmbulanceModal, setShowAmbulanceModal] = useState(false);
+  const [showMedicineModal, setShowMedicineModal] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -653,14 +657,14 @@ export const HomeScreen = () => {
         ))}
       </section>
 
-      {/* ── 🚑 🧪 TWO CORE ENQUIRY SERVICES (Ambulance + Test Reports with Service Photos) ── */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5">
-        {/* Ambulance Enquiry Card */}
+      {/* ── 🚑 🧪 💊 3 CORE HEALTHCARE ACTION SERVICES (Ambulance + Lab Reports + Medicine Door Delivery with Brand Logo) ── */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5">
+        {/* 1. Ambulance Services Card */}
         <div 
           onClick={() => setShowAmbulanceModal(true)}
           className="group relative overflow-hidden bg-white dark:bg-slate-850 rounded-2xl sm:rounded-3xl border border-red-200/90 dark:border-red-900/60 shadow-xs hover:shadow-xl hover:border-red-500/60 transition-all cursor-pointer flex flex-col justify-between"
         >
-          {/* Header Image with Gradient Overlay */}
+          {/* Header Image with Gradient Overlay & Brand Logo */}
           <div className="relative w-full h-36 sm:h-44 overflow-hidden bg-slate-900">
             <img
               src="/images/ambulance_service.jpg"
@@ -669,15 +673,22 @@ export const HomeScreen = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
             
-            {/* Floating Top Badge */}
-            <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-              <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-lg shadow-red-600/40">
-                <Siren size={20} className="animate-pulse" />
+            {/* Floating Top Bar: Icon + Category Badge + Brand Logo */}
+            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-md shadow-red-600/40">
+                  <Siren size={18} className="animate-pulse" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-red-600/95 text-white px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 backdrop-blur-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  <span>24/7 Rapid</span>
+                </span>
               </div>
-              <span className="text-[11px] font-black uppercase tracking-wider bg-red-600 text-white px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                <span>24/7 Rapid Response</span>
-              </span>
+              
+              {/* Brand Logo Badge */}
+              <div className="flex items-center bg-white/95 dark:bg-slate-900/95 px-2.5 py-1 rounded-xl shadow-md border border-white/50 backdrop-blur-md shrink-0">
+                <Image src="/newlogos.png" alt="Medinex World" width={68} height={22} className="h-4 w-auto object-contain" priority />
+              </div>
             </div>
 
             {/* Image Overlay Title */}
@@ -686,7 +697,7 @@ export const HomeScreen = () => {
                 Ambulance Services & Booking
               </h3>
               <p className="text-red-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
-                Normal, ICU & Air Ambulance transfers with emergency support
+                Normal, ICU & Air Ambulance emergency transfers
               </p>
             </div>
           </div>
@@ -694,20 +705,20 @@ export const HomeScreen = () => {
           {/* Card Body */}
           <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              Equipped with GPS tracking, oxygen & ventilator life support, and prompt dispatch for local & outstation emergencies.
+              Equipped with GPS tracking, oxygen & ventilator life support, and prompt dispatch for local & outstation transfers.
             </p>
 
             {/* 3 Ambulance Services Indicator Badges */}
             <div className="mt-2.5 flex flex-wrap gap-1.5">
-              <span className="text-[11px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
+              <span className="text-[10px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
                 <span>🚑</span>
                 <span>Normal Ambulance</span>
               </span>
-              <span className="text-[11px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
+              <span className="text-[10px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
                 <span>🏥</span>
                 <span>ICU Ambulance</span>
               </span>
-              <span className="text-[11px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
+              <span className="text-[10px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
                 <span>🚁</span>
                 <span>Air Ambulance</span>
               </span>
@@ -717,19 +728,19 @@ export const HomeScreen = () => {
               <span className="text-xs sm:text-sm font-extrabold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                 Request Ambulance Now <ArrowRight size={14} />
               </span>
-              <span className="text-[11px] font-extrabold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/60 dark:border-red-800/60">
+              <span className="text-[10px] font-extrabold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-md border border-red-200/60 dark:border-red-800/60">
                 ⚡ Fast Dispatch
               </span>
             </div>
           </div>
         </div>
 
-        {/* Test Report Enquiry Card */}
+        {/* 2. Test Report Enquiry Card */}
         <div 
           onClick={() => setShowTestModal(true)}
           className="group relative overflow-hidden bg-white dark:bg-slate-850 rounded-2xl sm:rounded-3xl border border-teal-200/90 dark:border-teal-900/60 shadow-xs hover:shadow-xl hover:border-teal-500/60 transition-all cursor-pointer flex flex-col justify-between"
         >
-          {/* Header Image with Gradient Overlay */}
+          {/* Header Image with Gradient Overlay & Brand Logo */}
           <div className="relative w-full h-36 sm:h-44 overflow-hidden bg-slate-900">
             <img
               src="/images/lab_test_service.jpg"
@@ -738,14 +749,21 @@ export const HomeScreen = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
             
-            {/* Floating Top Badge */}
-            <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-              <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-lg shadow-teal-600/40">
-                <FlaskConical size={20} />
+            {/* Floating Top Bar: Icon + Category Badge + Brand Logo */}
+            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/40">
+                  <FlaskConical size={18} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-teal-600/95 text-white px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 backdrop-blur-xs">
+                  <span>🧪 Lab Tests</span>
+                </span>
               </div>
-              <span className="text-[11px] font-black uppercase tracking-wider bg-teal-600 text-white px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                <span>🧪 Diagnostic Review</span>
-              </span>
+              
+              {/* Brand Logo Badge */}
+              <div className="flex items-center bg-white/95 dark:bg-slate-900/95 px-2.5 py-1 rounded-xl shadow-md border border-white/50 backdrop-blur-md shrink-0">
+                <Image src="/newlogos.png" alt="Medinex World" width={68} height={22} className="h-4 w-auto object-contain" priority />
+              </div>
             </div>
 
             {/* Image Overlay Title */}
@@ -754,7 +772,7 @@ export const HomeScreen = () => {
                 Test & Lab Report Enquiry
               </h3>
               <p className="text-teal-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
-                Pathology discounts, prescription review & home sample collection
+                Pathology discounts & doorstep sample collection
               </p>
             </div>
           </div>
@@ -764,12 +782,99 @@ export const HomeScreen = () => {
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Upload your doctor's prescription or lab report to compare pathology costs, get discounts, and schedule doorstep sample pickup.
             </p>
+
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-lg border border-teal-200/70 dark:border-teal-800/60 flex items-center gap-1">
+                <span>📋</span>
+                <span>Upload Prescription</span>
+              </span>
+              <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-lg border border-teal-200/70 dark:border-teal-800/60 flex items-center gap-1">
+                <span>🏠</span>
+                <span>Home Sample Pickup</span>
+              </span>
+            </div>
+
             <div className="mt-3 pt-3 border-t border-teal-100 dark:border-teal-900/30 flex items-center justify-between">
               <span className="text-xs sm:text-sm font-extrabold text-teal-600 dark:text-teal-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                Enquire Test / Upload Report <ArrowRight size={14} />
+                Enquire Test / Upload <ArrowRight size={14} />
               </span>
-              <span className="text-[11px] font-extrabold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-lg border border-teal-200/60 dark:border-teal-800/60">
+              <span className="text-[10px] font-extrabold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-md border border-teal-200/60 dark:border-teal-800/60">
                 🏠 Home Collection
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Medicine Door Delivery Card (NEW with Brand Logo) */}
+        <div 
+          onClick={() => setShowMedicineModal(true)}
+          className="group relative overflow-hidden bg-white dark:bg-slate-850 rounded-2xl sm:rounded-3xl border border-blue-200/90 dark:border-blue-900/60 shadow-xs hover:shadow-xl hover:border-blue-500/60 transition-all cursor-pointer flex flex-col justify-between"
+        >
+          {/* Header Image with Gradient Overlay & Brand Logo */}
+          <div className="relative w-full h-36 sm:h-44 overflow-hidden bg-slate-900">
+            <img
+              src="/images/medicine_door_delivery.jpg"
+              alt="Medicine Door Delivery & Prescription Fulfillment"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+            
+            {/* Floating Top Bar: Icon + Category Badge + Brand Logo */}
+            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/40">
+                  <Pill size={18} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-blue-600/95 text-white px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 backdrop-blur-xs">
+                  <span>💊 Doorstep Delivery</span>
+                </span>
+              </div>
+              
+              {/* Brand Logo Badge */}
+              <div className="flex items-center bg-white/95 dark:bg-slate-900/95 px-2.5 py-1 rounded-xl shadow-md border border-white/50 backdrop-blur-md shrink-0">
+                <Image src="/newlogos.png" alt="Medinex World" width={68} height={22} className="h-4 w-auto object-contain" priority />
+              </div>
+            </div>
+
+            {/* Image Overlay Title */}
+            <div className="absolute bottom-3 left-3.5 right-3.5">
+              <h3 className="font-black text-lg sm:text-xl text-white leading-tight drop-shadow-sm">
+                Medicine Door Delivery
+              </h3>
+              <p className="text-blue-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
+                Upload prescription & get genuine medicines delivered
+              </p>
+            </div>
+          </div>
+
+          {/* Card Body */}
+          <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Upload your doctor's prescription or medicine list to get verified medicines from licensed pharmacies with fast doorstep delivery.
+            </p>
+
+            {/* Medicine Delivery Indicator Badges */}
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-lg border border-blue-200/70 dark:border-blue-800/60 flex items-center gap-1">
+                <span>📸</span>
+                <span>Upload Prescription</span>
+              </span>
+              <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-lg border border-blue-200/70 dark:border-blue-800/60 flex items-center gap-1">
+                <span>⚡</span>
+                <span>Express Delivery</span>
+              </span>
+              <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-lg border border-blue-200/70 dark:border-blue-800/60 flex items-center gap-1">
+                <span>🏷️</span>
+                <span>Best Discounts</span>
+              </span>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-blue-100 dark:border-blue-900/30 flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-extrabold text-blue-600 dark:text-blue-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Order Medicines Now <ArrowRight size={14} />
+              </span>
+              <span className="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-200/60 dark:border-blue-800/60">
+                ⚡ Fast Doorstep
               </span>
             </div>
           </div>
@@ -1053,6 +1158,10 @@ export const HomeScreen = () => {
       <AmbulanceEnquiryModal
         isOpen={showAmbulanceModal}
         onClose={() => setShowAmbulanceModal(false)}
+      />
+      <MedicineDeliveryModal
+        isOpen={showMedicineModal}
+        onClose={() => setShowMedicineModal(false)}
       />
 
     </div>

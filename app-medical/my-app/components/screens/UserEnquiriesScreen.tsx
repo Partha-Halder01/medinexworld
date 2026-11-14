@@ -21,12 +21,15 @@ import {
   X,
   Search,
   User,
-  ArrowRight
+  ArrowRight,
+  Pill,
+  Truck
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/app/context/AppContext';
 import { TestReportEnquiryModal } from '@/components/screens/enquiry/TestReportEnquiryModal';
 import { AmbulanceEnquiryModal } from '@/components/screens/enquiry/AmbulanceEnquiryModal';
+import { MedicineDeliveryModal } from '@/components/screens/enquiry/MedicineDeliveryModal';
 
 export const UserEnquiriesScreen = () => {
   const router = useRouter();
@@ -324,6 +327,7 @@ export const UserEnquiriesScreen = () => {
           <div className="space-y-4">
             {filtered.map((enquiry) => {
               const isAmbulance = enquiry.type === 'ambulance';
+              const isMedicine = enquiry.type === 'medicine';
               const status = getStatusBadge(enquiry.status);
 
               return (
@@ -338,15 +342,17 @@ export const UserEnquiriesScreen = () => {
                         className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
                           isAmbulance
                             ? 'bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400'
+                            : isMedicine
+                            ? 'bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400'
                             : 'bg-teal-100 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400'
                         }`}
                       >
-                        {isAmbulance ? <Siren size={20} /> : <FlaskConical size={20} />}
+                        {isAmbulance ? <Siren size={20} /> : isMedicine ? <Pill size={20} /> : <FlaskConical size={20} />}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
-                            {isAmbulance ? `Ambulance: ${enquiry.ambulanceType || 'Rapid Transfer'}` : enquiry.testName}
+                            {isAmbulance ? `Ambulance: ${enquiry.ambulanceType || 'Rapid Transfer'}` : isMedicine ? 'Medicine Door Delivery' : enquiry.testName}
                           </h3>
                           <span className="text-xs font-bold text-slate-400">#{enquiry.id}</span>
                         </div>
@@ -399,6 +405,55 @@ export const UserEnquiriesScreen = () => {
                             <p className="text-slate-700 dark:text-slate-300">
                               {enquiry.patientCondition}
                             </p>
+                          </div>
+                        )}
+                      </>
+                    ) : isMedicine ? (
+                      <>
+                        <div className="space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                          <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <Truck size={13} className="text-blue-600" /> Delivery Address
+                          </p>
+                          <p className="text-slate-800 dark:text-slate-200 font-medium">
+                            {enquiry.pickupAddress}
+                          </p>
+                        </div>
+
+                        {enquiry.scheduledTime && (
+                          <div className="space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                              <Clock size={13} className="text-blue-600" /> Delivery Speed
+                            </p>
+                            <p className="text-slate-800 dark:text-slate-200 font-medium">
+                              {enquiry.scheduledTime}
+                            </p>
+                          </div>
+                        )}
+
+                        {enquiry.reportText && (
+                          <div className="sm:col-span-2 space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+                              Prescription Notes & Requirements
+                            </p>
+                            <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line">
+                              {enquiry.reportText}
+                            </p>
+                          </div>
+                        )}
+
+                        {enquiry.fileData && (
+                          <div className="sm:col-span-2 space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                              <FileText size={13} className="text-blue-600" /> Attached Prescription Document
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setPreviewDoc({ url: enquiry.fileData, title: 'Doctor Prescription' })}
+                              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
+                            >
+                              <span>View / Download Prescription</span>
+                              <ExternalLink size={12} />
+                            </button>
                           </div>
                         )}
                       </>

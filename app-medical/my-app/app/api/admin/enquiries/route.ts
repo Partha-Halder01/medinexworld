@@ -26,12 +26,13 @@ export async function GET(req: Request) {
         { patientEmail: { contains: search } },
         { city: { contains: search } },
         { testName: { contains: search } },
+        { reportText: { contains: search } },
         { pickupAddress: { contains: search } },
         { dropAddress: { contains: search } },
       ];
     }
 
-    const [enquiries, totalCount, pendingCount, ambulanceCount, urgentAmbulanceCount] = await Promise.all([
+    const [enquiries, totalCount, pendingCount, ambulanceCount, urgentAmbulanceCount, medicineCount] = await Promise.all([
       prisma.enquiry.findMany({
         where,
         orderBy: [
@@ -43,6 +44,7 @@ export async function GET(req: Request) {
       prisma.enquiry.count({ where: { status: 'pending' } }),
       prisma.enquiry.count({ where: { type: 'ambulance' } }),
       prisma.enquiry.count({ where: { type: 'ambulance', urgency: 'emergency', status: 'pending' } }),
+      prisma.enquiry.count({ where: { type: 'medicine' } }),
     ]);
 
     return NextResponse.json({
@@ -52,6 +54,7 @@ export async function GET(req: Request) {
         pending: pendingCount,
         ambulanceTotal: ambulanceCount,
         urgentAmbulance: urgentAmbulanceCount,
+        medicineTotal: medicineCount,
       },
     });
   } catch (error: any) {

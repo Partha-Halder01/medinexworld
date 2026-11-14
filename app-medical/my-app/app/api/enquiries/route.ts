@@ -29,8 +29,8 @@ export async function POST(req: Request) {
       patientCondition,
     } = body;
 
-    if (!type || (type !== 'test_report' && type !== 'ambulance')) {
-      return NextResponse.json({ error: 'Valid inquiry type (test_report or ambulance) is required.' }, { status: 400 });
+    if (!type || (type !== 'test_report' && type !== 'ambulance' && type !== 'medicine')) {
+      return NextResponse.json({ error: 'Valid inquiry type (test_report, ambulance, or medicine) is required.' }, { status: 400 });
     }
 
     if (!patientName || !patientName.trim()) {
@@ -44,6 +44,14 @@ export async function POST(req: Request) {
     // Additional validations per type
     if (type === 'ambulance' && !pickupAddress?.trim()) {
       return NextResponse.json({ error: 'Pickup location/address is required for ambulance service.' }, { status: 400 });
+    }
+
+    if (type === 'medicine' && !pickupAddress?.trim()) {
+      return NextResponse.json({ error: 'Delivery address is required for medicine door delivery.' }, { status: 400 });
+    }
+
+    if (type === 'medicine' && !reportText?.trim() && !fileData) {
+      return NextResponse.json({ error: 'Please provide prescription upload or medicine description.' }, { status: 400 });
     }
 
     if (type === 'test_report' && !testName?.trim() && !reportText?.trim() && !fileData) {
