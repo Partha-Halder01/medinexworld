@@ -28,6 +28,7 @@ model User {
   locationLat        Float?
   locationLng        Float?
   walletBalance      Float     @default(0)
+  familyMembers      Json      @default("[]")
   createdAt          DateTime  @default(now())
 
   appointments   Appointment[] @relation("PatientAppointments")
@@ -161,6 +162,9 @@ model Appointment {
   chamberAddress      String?   @db.Text
   visitDate           String?   @db.VarChar(10)
   serialNumber        Int?      @default(1)
+  patientName         String?
+  patientAge          Int?
+  patientGender       String?
   bookingFee          Float     @default(0)
   bookingFeePaid      Boolean   @default(false)
   paymentMethod       String    @default("cash")

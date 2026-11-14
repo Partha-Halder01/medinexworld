@@ -229,6 +229,10 @@ function BookingPanel({
   handleBookAppointment,
   showToast,
   router,
+  familyMembers,
+  currentUserName,
+  selectedPatientId,
+  setSelectedPatientId,
 }: {
   doctor: any;
   consultType: 'clinic' | 'video';
@@ -246,6 +250,10 @@ function BookingPanel({
   handleBookAppointment: () => void;
   showToast: (msg: string, type?: 'success' | 'error') => void;
   router: any;
+  familyMembers?: Array<{ id: string; name: string; age: number; gender: string }>;
+  currentUserName?: string;
+  selectedPatientId?: string;
+  setSelectedPatientId?: (id: string) => void;
 }) {
   const isVideoOff = true;
   const next7Days = useMemo(() => getNext7Days(), []);
@@ -598,6 +606,73 @@ function BookingPanel({
           </div>
         )}
 
+        {/* Who is this booking for? (If family members exist) */}
+        {familyMembers && familyMembers.length > 0 && setSelectedPatientId && (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Who is this booking for?
+              </label>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
+                {selectedPatientId === 'self' ? 'Myself' : 'Family Member'}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedPatientId('self')}
+                className={`p-2.5 rounded-2xl text-left border-2 transition-all flex items-center justify-between ${
+                  selectedPatientId === 'self'
+                    ? 'border-purple-600 bg-purple-50/70 dark:bg-purple-950/40 dark:border-purple-500'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
+                }`}
+              >
+                <div className="min-w-0 pr-1">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {currentUserName || 'Myself'}
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Account Owner (Self)</p>
+                </div>
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                  selectedPatientId === 'self' ? 'bg-purple-600 text-white' : 'border border-slate-300 dark:border-slate-600'
+                }`}>
+                  {selectedPatientId === 'self' && <Check size={10} strokeWidth={3.5} />}
+                </div>
+              </button>
+
+              {familyMembers.map((m) => {
+                const isSel = selectedPatientId === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setSelectedPatientId(m.id)}
+                    className={`p-2.5 rounded-2xl text-left border-2 transition-all flex items-center justify-between ${
+                      isSel
+                        ? 'border-purple-600 bg-purple-50/70 dark:bg-purple-950/40 dark:border-purple-500'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
+                    }`}
+                  >
+                    <div className="min-w-0 pr-1">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        {m.name}
+                      </p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                        {m.age} yrs • {m.gender}
+                      </p>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                      isSel ? 'bg-purple-600 text-white' : 'border border-slate-300 dark:border-slate-600'
+                    }`}>
+                      {isSel && <Check size={10} strokeWidth={3.5} />}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* 4. Price Transparency Card */}
         <div className="bg-slate-50 dark:bg-slate-800/70 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/60 space-y-2">
           <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
@@ -720,6 +795,7 @@ export default function DoctorProfileClient() {
   const [consultType, setConsultType] = useState<'clinic' | 'video'>('clinic');
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
+  const [selectedPatientId, setSelectedPatientId] = useState<string>('self');
   const [doctor, setDoctor] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'gallery' | 'location' | 'reviews'>('overview');
@@ -855,11 +931,46 @@ export default function DoctorProfileClient() {
     const slotLabel = showSlotPicker
       ? `${currentDay?.full}, ${selectedSlot}`
       : 'Anytime';
-    handleBookAppointment(doctor, slotLabel, currentDay?.dateNum || '', consultType);
+    const chosenMember = (selectedPatientId !== 'self' && currentUser?.familyMembers)
+      ? currentUser.familyMembers.find(m => m.id === selectedPatientId)
+      : null;
+    handleBookAppointment(
+      doctor, 
+      slotLabel, 
+      currentDay?.dateNum || '', 
+      consultType, 
+      undefined, 
+      {
+        patientName: chosenMember ? chosenMember.name : (currentUser?.name || undefined),
+        patientAge: chosenMember ? chosenMember.age : undefined,
+        patientGender: chosenMember ? chosenMember.gender : undefined,
+      }
+    );
   };
 
-  const handleBookChamber = async ({ chamber, visitDate, slot }: { chamber: PublicChamber; visitDate: string; slot: string }) => {
-    await handleBookAppointment(doctor, slot, formatDateLabel(visitDate), 'clinic', { chamberId: chamber.id, visitDate });
+  const handleBookChamber = async ({ 
+    chamber, 
+    visitDate, 
+    slot, 
+    patientName, 
+    patientAge, 
+    patientGender 
+  }: { 
+    chamber: PublicChamber; 
+    visitDate: string; 
+    slot: string; 
+    patientName?: string; 
+    patientAge?: number; 
+    patientGender?: string; 
+  }) => {
+    await handleBookAppointment(
+      doctor, 
+      slot, 
+      formatDateLabel(visitDate), 
+      'clinic', 
+      { chamberId: chamber.id, visitDate },
+      { patientName, patientAge, patientGender }
+    );
   };
 
   const goToLogin = () => router.push('/login?redirect=' + encodeURIComponent(window.location.pathname));
@@ -1655,13 +1766,21 @@ export default function DoctorProfileClient() {
                 isLoggedIn={isLoggedIn && currentUser?.role === 'patient'}
                 initialLocation={currentUser?.location ?? null}
                 selectedChamberId={activeChamberId}
+                familyMembers={currentUser?.familyMembers}
+                currentUserName={currentUser?.name}
                 onSelectChamber={setSelectedChamberId}
                 onBook={handleBookChamber}
                 onLogin={goToLogin}
                 onRegister={goToRegister}
               />
             ) : (
-              <BookingPanel {...bookingProps} />
+              <BookingPanel 
+                {...bookingProps}
+                familyMembers={currentUser?.familyMembers}
+                currentUserName={currentUser?.name}
+                selectedPatientId={selectedPatientId}
+                setSelectedPatientId={setSelectedPatientId}
+              />
             )}
 
             {/* Confirmed Booking Guarantee - Phone revealed after booking */}

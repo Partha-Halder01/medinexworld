@@ -54,11 +54,12 @@ export const DoctorAppointmentsScreen = () => {
       (activeTab === 'Upcoming' && apt.status === 'Confirmed') ||
       (activeTab === 'Completed' && apt.status === 'Completed') ||
       (activeTab === 'Cancelled' && apt.status === 'Cancelled');
-    const patientName = apt.patientId?.name || 'Patient';
+    const patientName = apt.patientName || apt.patientId?.name || 'Patient';
     const patientEmail = apt.patientId?.email || '';
     const patientPhone = apt.patientId?.phone || '';
     const matchSearch = searchTerm === '' ||
       patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (apt.patientId?.name && apt.patientId.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       patientEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patientPhone.toLowerCase().includes(searchTerm.toLowerCase());
     const matchChamber = chamberFilter === 'all' || String(apt.chamberId ?? apt.chamberName) === chamberFilter;
@@ -213,7 +214,22 @@ export const DoctorAppointmentsScreen = () => {
                           <User size={16} />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-gray-900 dark:text-white truncate">{apt.patientId?.name || 'Patient'}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold text-gray-900 dark:text-white truncate">{apt.patientName || apt.patientId?.name || 'Patient'}</p>
+                            {apt.patientName && apt.patientId?.name && apt.patientName !== apt.patientId.name && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 shrink-0">
+                                Family
+                              </span>
+                            )}
+                          </div>
+                          {(apt.patientGender || apt.patientAge != null) && (
+                            <p className="text-xs text-purple-700 dark:text-purple-300 font-medium">
+                              {[apt.patientGender, apt.patientAge != null ? `${apt.patientAge} yrs` : null].filter(Boolean).join(' • ')}
+                            </p>
+                          )}
+                          {apt.patientName && apt.patientId?.name && apt.patientName !== apt.patientId.name && (
+                            <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">Booked by: {apt.patientId.name}</p>
+                          )}
                           <p className="text-xs text-gray-400 truncate">{apt.patientId?.email || ''}</p>
                           {apt.patientId?.phone && (
                             <div className="mt-0.5 flex items-center gap-2">
@@ -307,7 +323,22 @@ export const DoctorAppointmentsScreen = () => {
                     <User size={18} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 dark:text-white truncate">{apt.patientId?.name || 'Patient'}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-gray-900 dark:text-white truncate">{apt.patientName || apt.patientId?.name || 'Patient'}</p>
+                      {apt.patientName && apt.patientId?.name && apt.patientName !== apt.patientId.name && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 shrink-0">
+                          Family
+                        </span>
+                      )}
+                    </div>
+                    {(apt.patientGender || apt.patientAge != null) && (
+                      <p className="text-xs text-purple-700 dark:text-purple-300 font-medium">
+                        {[apt.patientGender, apt.patientAge != null ? `${apt.patientAge} yrs` : null].filter(Boolean).join(' • ')}
+                      </p>
+                    )}
+                    {apt.patientName && apt.patientId?.name && apt.patientName !== apt.patientId.name && (
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">Booked by: {apt.patientId.name}</p>
+                    )}
                     {apt.patientId?.phone && (
                       <div className="mt-0.5 flex items-center gap-2">
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{apt.patientId.phone}</p>

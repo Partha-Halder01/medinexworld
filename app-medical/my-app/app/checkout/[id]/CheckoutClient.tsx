@@ -56,6 +56,42 @@ export default function CheckoutClient() {
   const [processing, setProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failed'>('idle');
 
+  const [switchingPatient, setSwitchingPatient] = useState(false);
+
+  const handleSwitchPatient = async (memberId: string) => {
+    if (!checkoutId || !currentUser?._id) return;
+    const isSelf = memberId === 'self';
+    const chosen = !isSelf ? currentUser.familyMembers?.find((m: any) => m.id === memberId) : null;
+    const pName = isSelf ? currentUser.name : (chosen?.name || '');
+    const pAge = isSelf ? null : (chosen?.age ?? null);
+    const pGender = isSelf ? null : (chosen?.gender ?? null);
+
+    setSwitchingPatient(true);
+    try {
+      const res = await fetch(`/api/appointments/${checkoutId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientId: currentUser._id,
+          patientName: pName,
+          patientAge: pAge,
+          patientGender: pGender,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAppointment((prev: any) => ({ ...prev, ...data }));
+        showToast(`Patient updated to ${pName}`, 'success');
+      } else {
+        showToast('Failed to switch patient', 'error');
+      }
+    } catch {
+      showToast('Failed to switch patient', 'error');
+    } finally {
+      setSwitchingPatient(false);
+    }
+  };
+
   useEffect(() => {
     if (!isAuthReady) return;
 
@@ -659,17 +695,81 @@ export default function CheckoutClient() {
                 })()}
 
                 {/* Patient Information */}
-                <div className="p-4 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200/70 dark:border-slate-800 flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
-                    <UserIcon size={18} />
+                <div className="p-4 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200/70 dark:border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between gap-3.5">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+                        <UserIcon size={18} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Patient Details</p>
+                          {appointment?.patientName && appointment.patientName !== currentUser?.name && (
+                            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
+                              Family Member
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
+                          {appointment?.patientName || currentUser?.name}
+                        </p>
+                        {(appointment?.patientAge != null || appointment?.patientGender) && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            {[appointment?.patientGender, appointment?.patientAge != null ? `${appointment.patientAge} yrs` : null].filter(Boolean).join(' • ')}
+                          </p>
+                        )}
+                        {appointment?.patientName && appointment.patientName !== currentUser?.name && (
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                            Booked by: {currentUser?.name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {currentUser?.phone && (
+                      <div className="text-right text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+                        {currentUser.phone}
+                      </div>
+                    )}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Patient Name</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">{currentUser?.name}</p>
-                  </div>
-                  {currentUser?.phone && (
-                    <div className="text-right text-xs font-semibold text-slate-500 dark:text-slate-400">
-                      {currentUser.phone}
+
+                  {/* Switch patient if family members exist */}
+                  {currentUser?.familyMembers && currentUser.familyMembers.length > 0 && (
+                    <div className="pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">
+                        Change Patient:
+                      </p>
+                      <div className="flex gap-1.5 flex-wrap">
+                        <button
+                          type="button"
+                          disabled={switchingPatient}
+                          onClick={() => handleSwitchPatient('self')}
+                          className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all ${
+                            !appointment?.patientName || appointment?.patientName === currentUser?.name
+                              ? 'bg-teal-600 text-white border-teal-600 shadow-2xs'
+                              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-teal-400'
+                          }`}
+                        >
+                          Myself ({currentUser?.name?.split(' ')[0]})
+                        </button>
+                        {currentUser.familyMembers.map((m: any) => {
+                          const isSel = appointment?.patientName === m.name;
+                          return (
+                            <button
+                              key={m.id}
+                              type="button"
+                              disabled={switchingPatient}
+                              onClick={() => handleSwitchPatient(m.id)}
+                              className={`text-xs px-2.5 py-1 rounded-xl font-bold border transition-all ${
+                                isSel
+                                  ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-purple-400'
+                              }`}
+                            >
+                              {m.name} ({m.gender?.charAt(0)}, {m.age})
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>

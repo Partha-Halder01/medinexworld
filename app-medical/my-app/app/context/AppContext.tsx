@@ -8,7 +8,24 @@ type Appointment = any;
 type ToastMessage = { message: string; type: "success" | "error" } | null;
 type AuthRole = 'patient' | 'doctor';
 
-type UserInfo = { _id: string; name: string; email: string; phone?: string; role: string; specialty?: string; location?: { lat: number; lng: number } | null } | null;
+export type FamilyMember = {
+  id: string;
+  name: string;
+  age: number;
+  gender: 'Male' | 'Female' | 'Other' | string;
+  createdAt?: string;
+};
+
+export type UserInfo = { 
+  _id: string; 
+  name: string; 
+  email: string; 
+  phone?: string; 
+  role: string; 
+  specialty?: string; 
+  location?: { lat: number; lng: number } | null;
+  familyMembers?: FamilyMember[];
+} | null;
 
 export interface SiteSettings {
   supportEmail: string;
@@ -27,6 +44,8 @@ interface AppContextType {
   isAuthReady: boolean;
   isLoggedIn: boolean;
   currentUser: UserInfo;
+  setCurrentUser: React.Dispatch<React.SetStateAction<UserInfo>>;
+  refreshUser: () => Promise<void>;
   login: (email: string, password: string, role?: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
   loginDoctor: (email: string, password: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
   loginWithOtp: (email: string, otp: string, role: AuthRole, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
@@ -45,7 +64,14 @@ interface AppContextType {
   searchFilter: string;
   setSearchFilter: (filter: string) => void;
   handleCategoryClick: (category: string) => void;
-  handleBookAppointment: (doctor: Doctor, slot: string, date: string, type: 'clinic'|'video', chamber?: ChamberBooking) => Promise<void>;
+  handleBookAppointment: (
+    doctor: Doctor, 
+    slot: string, 
+    date: string, 
+    type: 'clinic'|'video', 
+    chamber?: ChamberBooking,
+    patientInfo?: { patientName?: string; patientAge?: number; patientGender?: string }
+  ) => Promise<void>;
   startInstantCall: (doctor: Doctor) => void;
   endVideoCall: () => void;
   siteSettings: SiteSettings;
@@ -119,12 +145,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Fetch appointments when user logs in
+  // Fetch appointments & refresh user profile when user logs in
   useEffect(() => {
     if (isLoggedIn && currentUser?._id) {
       fetchAppointments();
+      refreshUser();
     }
   }, [isLoggedIn, currentUser?._id]);
+
+  const refreshUser = async () => {
+    if (!currentUser?._id || !isValidEntityId(currentUser._id)) return;
+    try {
+      const res = await fetch(`/api/users/${currentUser._id}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setCurrentUser(prev => {
+          if (!prev) return data;
+          const updated = { ...prev, ...data };
+          const storageType: 'local' | 'session' =
+            sessionStorage.getItem('aurahealth_user') ? 'session' : 'local';
+          writeAuthUser(updated, storageType);
+          return updated;
+        });
+      }
+    } catch {}
+  };
 
   // Capture GPS and save to DB + localStorage (silent — no error thrown to user)
   const captureAndSaveLocation = async (userId: string, role: string) => {
@@ -291,7 +336,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleBookAppointment = async (doctor: Doctor, slot: string, date: string, consultType: 'clinic'|'video', chamber?: ChamberBooking) => {
+  const handleBookAppointment = async (
+    doctor: Doctor, 
+    slot: string, 
+    date: string, 
+    consultType: 'clinic'|'video', 
+    chamber?: ChamberBooking,
+    patientInfo?: { patientName?: string; patientAge?: number; patientGender?: string }
+  ) => {
     if (!currentUser?._id) {
       showToast('Please log in to book an appointment.', 'error');
       const redirectPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/';
@@ -324,6 +376,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           type: consultType,
           price: price || 0,
           ...(chamber ? { chamberId: chamber.chamberId, visitDate: chamber.visitDate } : {}),
+          ...(patientInfo?.patientName ? { patientName: patientInfo.patientName } : {}),
+          ...(patientInfo?.patientAge != null ? { patientAge: patientInfo.patientAge } : {}),
+          ...(patientInfo?.patientGender ? { patientGender: patientInfo.patientGender } : {}),
         }),
       });
 
@@ -380,7 +435,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider value={{
       theme, setTheme,
       isAuthReady,
-      isLoggedIn, currentUser, login, loginDoctor, loginWithOtp, register, logout,
+      isLoggedIn, currentUser, setCurrentUser, refreshUser, login, loginDoctor, loginWithOtp, register, logout,
       activeVideoCall, setActiveVideoCall,
       appointments, setAppointments, fetchAppointments,
       toast, setToast, showToast,

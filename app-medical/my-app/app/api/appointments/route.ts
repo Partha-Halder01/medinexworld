@@ -10,6 +10,9 @@ function apptToResponse(a: any) {
     ...a,
     _id: a.id,
     serialNumber: a.serialNumber || 1,
+    patientName: a.patientName || a.patient?.name || null,
+    patientAge: a.patientAge || null,
+    patientGender: a.patientGender || null,
     patientId: a.patient ? { ...a.patient, _id: a.patient.id } : a.patientId,
     doctorId: a.doctor ? { ...a.doctor, _id: a.doctor.id, location: a.doctor.locationLat != null ? { lat: a.doctor.locationLat, lng: a.doctor.locationLng } : null } : a.doctorId,
     hospitalId: a.hospital ? { ...a.hospital, _id: a.hospital.id, location: a.hospital.locationLat != null ? { lat: a.hospital.locationLat, lng: a.hospital.locationLng } : null } : a.hospitalId,
@@ -52,15 +55,22 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { patientId, doctorId, hospitalId, chamberId, visitDate, serviceType, serviceName, slot, date, type, price } = await req.json();
+    const { 
+      patientId, doctorId, hospitalId, chamberId, visitDate, 
+      serviceType, serviceName, slot, date, type, price,
+      patientName, patientAge, patientGender 
+    } = await req.json();
 
     const pId = parseInt(patientId, 10);
     const dId = doctorId ? parseInt(doctorId, 10) : null;
     const hId = hospitalId ? parseInt(hospitalId, 10) : null;
+    const pAge = patientAge != null && patientAge !== '' ? parseInt(String(patientAge), 10) : null;
+    const pName = typeof patientName === 'string' && patientName.trim() ? patientName.trim() : null;
+    const pGender = typeof patientGender === 'string' && patientGender.trim() ? patientGender.trim() : null;
 
     if (chamberId) {
       if (isNaN(pId) || !dId || isNaN(dId)) return NextResponse.json({ error: 'Patient and doctor are required.' }, { status: 400 });
-      return createChamberAppointment(pId, dId, parseInt(chamberId, 10), visitDate, slot);
+      return createChamberAppointment(pId, dId, parseInt(chamberId, 10), visitDate, slot, pName, pAge, pGender);
     }
 
     if (!patientId || !slot || !date || !type) return NextResponse.json({ error: 'Required fields are missing.' }, { status: 400 });
@@ -117,6 +127,9 @@ export async function POST(req: Request) {
         serviceType: serviceType || 'doctor', serviceName: serviceName || '',
         slot, date, type, basePrice, price: finalPrice, paidAmount: 0,
         serialNumber,
+        patientName: pName,
+        patientAge: pAge,
+        patientGender: pGender,
         platformFeePercent, platformFeeAmount,
         paymentMethod: 'online', paymentStatus: 'pending', status: 'Confirmed',
       },
@@ -141,7 +154,16 @@ const appointmentInclude = {
 
 // In-chamber booking: the patient pays only the platform booking fee online;
 // the consultation fee is paid to the doctor at the chamber.
-async function createChamberAppointment(patientId: number, doctorId: number, chamberId: number, visitDate: unknown, slot: unknown) {
+async function createChamberAppointment(
+  patientId: number, 
+  doctorId: number, 
+  chamberId: number, 
+  visitDate: unknown, 
+  slot: unknown,
+  patientName?: string | null,
+  patientAge?: number | null,
+  patientGender?: string | null
+) {
   if (isNaN(chamberId)) return NextResponse.json({ error: 'Invalid chamber.' }, { status: 400 });
   if (!isValidISODate(visitDate)) return NextResponse.json({ error: 'Please choose a valid date.' }, { status: 400 });
   if (typeof slot !== 'string' || !slot) return NextResponse.json({ error: 'Please choose a time slot.' }, { status: 400 });
@@ -183,6 +205,9 @@ async function createChamberAppointment(patientId: number, doctorId: number, cha
       slot, date: formattedDate, visitDate: visitDateStr, type: 'clinic',
       chamberName: chamber.name, chamberAddress: chamber.address,
       serialNumber,
+      patientName: patientName ?? null,
+      patientAge: patientAge ?? null,
+      patientGender: patientGender ?? null,
       basePrice: consultationFee, price: consultationFee + bookingFee, paidAmount: 0,
       bookingFee, bookingFeePaid: bookingFee <= 0,
       platformFeePercent: 0, platformFeeAmount: bookingFee,

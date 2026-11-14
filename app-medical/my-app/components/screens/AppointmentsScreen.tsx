@@ -200,6 +200,20 @@ export const AppointmentsScreen = () => {
                     <div>
                       <h4 className="font-black text-gray-900 dark:text-white text-lg sm:text-xl leading-tight group-hover:text-teal-600 transition-colors">{title}</h4>
                       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-bold mt-0.5 uppercase tracking-wide">{subTitle}</p>
+                      
+                      {/* Family member / Patient name badge */}
+                      {apt.patientName && (
+                        <div className="inline-flex items-center gap-1.5 mt-1.5 px-2.5 py-0.5 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-xs font-bold border border-purple-200/60 dark:border-purple-800/60">
+                          <User size={12} />
+                          <span>Patient: {apt.patientName}</span>
+                          {(apt.patientGender || apt.patientAge != null) && (
+                            <span className="text-[11px] opacity-80">
+                              ({[apt.patientGender, apt.patientAge != null ? `${apt.patientAge} yrs` : null].filter(Boolean).join(', ')})
+                            </span>
+                          )}
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-2 mt-2">
                         <div className={`p-1 rounded-md ${apt.type === 'video' ? 'bg-indigo-50 dark:bg-indigo-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
                           <ServiceIcon size={13} className={iconColor} />

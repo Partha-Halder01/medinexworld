@@ -5,6 +5,7 @@ import {
   Stethoscope, Shield, Star, Navigation, LocateFixed, MapPin, CheckCircle2,
   AlertTriangle, Pencil, X, Check, Lock, Eye, EyeOff, Phone, Mail,
   ChevronRight, LogOut, CalendarCheck, Clock, FileText, FlaskConical, ClipboardList,
+  Users, Trash2, Plus,
 } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
 import { useLanguage } from '@/app/context/LanguageContext';
@@ -36,7 +37,7 @@ const getInitials = (name: string) => {
 };
 
 export const UserProfileScreen = () => {
-  const { showToast, logout, currentUser, isLoggedIn } = useAppContext();
+  const { showToast, logout, currentUser, setCurrentUser, isLoggedIn } = useAppContext();
   const { t } = useLanguage();
   const router = useRouter();
 
@@ -45,6 +46,15 @@ export const UserProfileScreen = () => {
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // ── Family Members state ──────────────────────────────────────────────────
+  const [familyMembers, setFamilyMembers] = useState<Array<{ id: string; name: string; age: number; gender: string }>>([]);
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [memberName, setMemberName] = useState('');
+  const [memberAge, setMemberAge] = useState('');
+  const [memberGender, setMemberGender] = useState<'Male' | 'Female' | 'Other'>('Male');
+  const [memberSaving, setMemberSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // ── Password change state ─────────────────────────────────────────────────
   const [showPwSection, setShowPwSection] = useState(false);
@@ -67,6 +77,95 @@ export const UserProfileScreen = () => {
       setEditPhone((currentUser as any).phone || '');
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser?.familyMembers && Array.isArray(currentUser.familyMembers)) {
+      setFamilyMembers(currentUser.familyMembers);
+    }
+  }, [currentUser?.familyMembers]);
+
+  useEffect(() => {
+    if (!currentUser?._id) return;
+    fetch(`/api/users/${currentUser._id}/family-members`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data.familyMembers)) {
+          setFamilyMembers(data.familyMembers);
+        }
+      })
+      .catch(() => {});
+  }, [currentUser?._id]);
+
+  const handleAddMember = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!currentUser?._id) return;
+    if (!memberName.trim()) {
+      showToast('Please enter family member name.', 'error');
+      return;
+    }
+    const ageNum = parseInt(memberAge, 10);
+    if (isNaN(ageNum) || ageNum < 0 || ageNum > 125) {
+      showToast('Please enter a valid age (0 - 125).', 'error');
+      return;
+    }
+
+    setMemberSaving(true);
+    try {
+      const res = await fetch(`/api/users/${currentUser._id}/family-members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: memberName.trim(),
+          age: ageNum,
+          gender: memberGender,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to add family member.', 'error');
+        return;
+      }
+      const updatedList = data.familyMembers || [];
+      setFamilyMembers(updatedList);
+      if (setCurrentUser) {
+        setCurrentUser(prev => prev ? { ...prev, familyMembers: updatedList } : prev);
+      }
+      showToast('Family member added successfully!', 'success');
+      setMemberName('');
+      setMemberAge('');
+      setMemberGender('Male');
+      setShowAddMember(false);
+    } catch {
+      showToast('Failed to add family member.', 'error');
+    } finally {
+      setMemberSaving(false);
+    }
+  };
+
+  const handleDeleteMember = async (memberId: string) => {
+    if (!currentUser?._id) return;
+    setDeletingId(memberId);
+    try {
+      const res = await fetch(`/api/users/${currentUser._id}/family-members?memberId=${encodeURIComponent(memberId)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to remove member.', 'error');
+        return;
+      }
+      const updatedList = data.familyMembers || [];
+      setFamilyMembers(updatedList);
+      if (setCurrentUser) {
+        setCurrentUser(prev => prev ? { ...prev, familyMembers: updatedList } : prev);
+      }
+      showToast('Family member removed.', 'success');
+    } catch {
+      showToast('Failed to remove family member.', 'error');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!currentUser?._id) return;
@@ -364,6 +463,195 @@ export const UserProfileScreen = () => {
               </div>
             </div>
           )}
+
+          {/* ── Family Members Card ────────────────────────────────────────── */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center">
+                  <Users size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-sm">Family Members</h3>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500">Add family to book appointments for them</p>
+                </div>
+              </div>
+              {!showAddMember && (
+                <button
+                  type="button"
+                  onClick={() => setShowAddMember(true)}
+                  className="flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-800 transition-colors"
+                >
+                  <Plus size={14} /> Add Member
+                </button>
+              )}
+            </div>
+
+            {/* Add Form */}
+            {showAddMember && (
+              <form onSubmit={handleAddMember} className="p-5 bg-purple-50/40 dark:bg-purple-950/20 border-b border-purple-100 dark:border-purple-900/40 space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-black uppercase tracking-wider text-purple-700 dark:text-purple-400">
+                    New Family Member
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { setShowAddMember(false); setMemberName(''); setMemberAge(''); }}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Name input */}
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 dark:text-gray-300 block mb-1">
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={memberName}
+                      onChange={(e) => setMemberName(e.target.value)}
+                      placeholder="e.g. John Doe"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    />
+                  </div>
+
+                  {/* Age and Gender row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Age input */}
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 dark:text-gray-300 block mb-1">
+                        Age (in years) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        min={0}
+                        max={125}
+                        value={memberAge}
+                        onChange={(e) => setMemberAge(e.target.value)}
+                        placeholder="e.g. 28"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                      />
+                    </div>
+
+                    {/* Gender input */}
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 dark:text-gray-300 block mb-1">
+                        Gender <span className="text-red-500">*</span>
+                      </label>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {(['Male', 'Female', 'Other'] as const).map((g) => (
+                          <button
+                            type="button"
+                            key={g}
+                            onClick={() => setMemberGender(g)}
+                            className={`py-2 text-xs font-bold rounded-xl border transition-all ${
+                              memberGender === g
+                                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                                : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-purple-300'
+                            }`}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setShowAddMember(false); setMemberName(''); setMemberAge(''); }}
+                    className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 text-xs font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={memberSaving || !memberName.trim() || !memberAge}
+                    className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-purple-600/20 flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    {memberSaving ? (
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <><Check size={14} /> Save Member</>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Family Members List */}
+            <div className="p-4 sm:p-5">
+              {familyMembers.length === 0 ? (
+                <div className="text-center py-6 px-4">
+                  <div className="w-12 h-12 mx-auto rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-500 flex items-center justify-center mb-2.5">
+                    <Users size={22} />
+                  </div>
+                  <p className="text-sm font-bold text-gray-700 dark:text-gray-200">No family members added</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-sm mx-auto">
+                    Add family members so you can easily select who the appointment is for during booking.
+                  </p>
+                  {!showAddMember && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddMember(true)}
+                      className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 px-3.5 py-2 rounded-xl transition-colors border border-purple-200 dark:border-purple-800"
+                    >
+                      <Plus size={14} /> Add First Family Member
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {familyMembers.map((m) => (
+                    <div
+                      key={m.id}
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/40 hover:border-purple-200 dark:hover:border-purple-800 transition-all"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold text-sm flex items-center justify-center shrink-0">
+                          {m.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
+                            {m.name}
+                          </p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">
+                              {m.age} yrs
+                            </span>
+                            <span className="text-[10px] text-gray-300">•</span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-100/70 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300">
+                              {m.gender}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMember(m.id)}
+                        disabled={deletingId === m.id}
+                        title="Remove family member"
+                        className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors shrink-0"
+                      >
+                        {deletingId === m.id ? (
+                          <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 size={15} />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* ── Digital Prescriptions Card ─────────────────────────────────── */}
           <Link href="/profile/prescriptions" className="block bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">

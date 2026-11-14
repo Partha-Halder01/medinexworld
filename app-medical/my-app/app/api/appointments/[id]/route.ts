@@ -50,3 +50,51 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ error: error.message || 'Failed to fetch appointment.' }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const numId = parseInt(id, 10);
+    if (isNaN(numId)) return NextResponse.json({ error: 'Invalid appointment id.' }, { status: 400 });
+
+    const body = await req.json();
+    const { patientName, patientAge, patientGender, patientId } = body;
+
+    const where: any = { id: numId };
+    if (patientId) where.patientId = parseInt(patientId, 10);
+
+    const data: any = {};
+    if (patientName !== undefined) {
+      data.patientName = typeof patientName === 'string' && patientName.trim() ? patientName.trim() : null;
+    }
+    if (patientAge !== undefined) {
+      data.patientAge = patientAge != null && patientAge !== '' ? parseInt(String(patientAge), 10) : null;
+    }
+    if (patientGender !== undefined) {
+      data.patientGender = typeof patientGender === 'string' && patientGender.trim() ? patientGender.trim() : null;
+    }
+
+    const updated = await prisma.appointment.update({
+      where,
+      data,
+      include: {
+        patient: { select: { id: true, name: true, email: true, phone: true, role: true } },
+        doctor: { select: { id: true, name: true, specialty: true, fee: true, videoFee: true, image: true } },
+        hospital: { select: { id: true, name: true, email: true, phone: true, address: true } },
+        chamber: true,
+      },
+    });
+
+    const { doctor: rawDoctor, patient, hospital, chamber, ...rest } = updated as any;
+    return NextResponse.json({
+      ...rest, _id: rest.id,
+      serialNumber: rest.serialNumber || 1,
+      patientId: patient ? { ...patient, _id: patient.id } : rest.patientId,
+      chamber: chamber ? serializeChamber(chamber) : null,
+      doctorId: rawDoctor ? { ...rawDoctor, _id: rawDoctor.id } : rest.doctorId,
+      hospitalId: hospital ? { ...hospital, _id: hospital.id } : rest.hospitalId,
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to update appointment.' }, { status: 500 });
+  }
+}
