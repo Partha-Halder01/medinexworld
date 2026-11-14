@@ -200,10 +200,10 @@ export const TestReportEnquiryModal: React.FC<TestReportEnquiryModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-base sm:text-lg">Test & Lab Report Enquiry</h3>
-                <span className="text-[10px] uppercase font-bold bg-white/20 px-2 py-0.5 rounded-full tracking-wider">Diagnostic</span>
+                <h3 className="font-extrabold text-base sm:text-lg">Diagnostic Services</h3>
+                <span className="text-[10px] uppercase font-bold bg-white/20 px-2 py-0.5 rounded-full tracking-wider">Pathology</span>
               </div>
-              <p className="text-xs text-teal-100 font-medium">Get discount quotes & expert pathologist review</p>
+              <p className="text-xs text-teal-100 font-medium">Pathology tests, prescription review & home sample pickup</p>
             </div>
           </div>
           <button

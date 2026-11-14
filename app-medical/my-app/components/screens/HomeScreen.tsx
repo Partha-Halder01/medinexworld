@@ -756,7 +756,7 @@ export const HomeScreen = () => {
                   <FlaskConical size={18} />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-wider bg-teal-600/95 text-white px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 backdrop-blur-xs">
-                  <span>🧪 Lab Tests</span>
+                  <span>🧪 Diagnostic Services</span>
                 </span>
               </div>
               
@@ -769,7 +769,7 @@ export const HomeScreen = () => {
             {/* Image Overlay Title */}
             <div className="absolute bottom-3 left-3.5 right-3.5">
               <h3 className="font-black text-lg sm:text-xl text-white leading-tight drop-shadow-sm">
-                Test & Lab Report Enquiry
+                Diagnostic Services
               </h3>
               <p className="text-teal-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
                 Pathology discounts & doorstep sample collection
