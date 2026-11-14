@@ -89,7 +89,7 @@ export async function POST(req: Request) {
         fileType: fileType || null,
         preferredDate: preferredDate || null,
         // Ambulance fields
-        ambulanceType: ambulanceType || (type === 'ambulance' ? 'Basic Life Support (BLS)' : null),
+        ambulanceType: ambulanceType || (type === 'ambulance' ? 'Normal Ambulance' : null),
         pickupAddress: pickupAddress?.trim() || null,
         pickupLat: typeof pickupLat === 'number' ? pickupLat : null,
         pickupLng: typeof pickupLng === 'number' ? pickupLng : null,

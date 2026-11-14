@@ -15,7 +15,9 @@ import {
   ShieldAlert, 
   Sparkles, 
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  Plane,
+  HeartPulse
 } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
 import { useRouter } from 'next/navigation';
@@ -27,10 +29,30 @@ interface AmbulanceEnquiryModalProps {
 }
 
 const AMBULANCE_TYPES = [
-  { id: 'Basic Life Support (BLS)', label: 'Basic Life Support (BLS)', desc: 'Oxygen, standard stretcher, paramedic on board' },
-  { id: 'Advanced Life Support (ALS / ICU)', label: 'ICU / Advanced Life Support (ALS)', desc: 'Ventilator, cardiac monitor, critical care doctor/nurse' },
-  { id: 'Patient Transport Ambulance', label: 'Patient Transport Van', desc: 'Wheelchair / stable non-emergency transfer' },
-  { id: 'Neonatal / Pediatric Ambulance', label: 'Neonatal / Pediatric ICU', desc: 'Incubator & specialized pediatric equipment' },
+  { 
+    id: 'Normal Ambulance', 
+    letter: 'a',
+    label: 'Normal Ambulance', 
+    desc: 'Oxygen cylinder, stretcher & paramedic for standard emergency and patient transfers',
+    tag: 'Standard Life Support',
+    icon: Siren,
+  },
+  { 
+    id: 'ICU Ambulance', 
+    letter: 'b',
+    label: 'ICU Ambulance', 
+    desc: 'Ventilator, cardiac monitor, infusion pump & critical care doctor/nurse team',
+    tag: 'Advanced Life Support (ALS)',
+    icon: HeartPulse,
+  },
+  { 
+    id: 'Air Ambulance', 
+    letter: 'c',
+    label: 'Air Ambulance', 
+    desc: 'Emergency aeromedical flights & helicopter evacuation for long-distance rapid medical transfers',
+    tag: 'Aero-Medical Evacuation',
+    icon: Plane,
+  },
 ];
 
 export const AmbulanceEnquiryModal: React.FC<AmbulanceEnquiryModalProps> = ({
@@ -45,7 +67,7 @@ export const AmbulanceEnquiryModal: React.FC<AmbulanceEnquiryModalProps> = ({
   const [patientName, setPatientName] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
   const [patientEmail, setPatientEmail] = useState('');
-  const [ambulanceType, setAmbulanceType] = useState('Basic Life Support (BLS)');
+  const [ambulanceType, setAmbulanceType] = useState('Normal Ambulance');
   const [pickupAddress, setPickupAddress] = useState('');
   const [pickupCoords, setPickupCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [dropAddress, setDropAddress] = useState('');
@@ -319,27 +341,60 @@ export const AmbulanceEnquiryModal: React.FC<AmbulanceEnquiryModalProps> = ({
                 </div>
               </div>
 
-              {/* Ambulance Category Selection */}
+              {/* Ambulance Category Selection - 3 Core Ambulance Services */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                  Select Ambulance Type
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Select Ambulance Service <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">3 Available Services</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {AMBULANCE_TYPES.map((type) => {
                     const isSelected = ambulanceType === type.id;
+                    const IconComp = type.icon;
                     return (
                       <button
                         key={type.id}
                         type="button"
                         onClick={() => setAmbulanceType(type.id)}
-                        className={`p-3 rounded-xl border text-left transition-all ${
+                        className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between ${
                           isSelected
-                            ? 'border-red-500 bg-red-50/60 dark:bg-red-950/30 text-red-900 dark:text-red-200 ring-1 ring-red-500'
-                            : 'border-slate-200 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                            ? 'border-red-500 bg-red-50/80 dark:bg-red-950/40 text-red-900 dark:text-red-200 ring-2 ring-red-500 shadow-xs'
+                            : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 hover:border-slate-300 hover:bg-slate-100/60 dark:hover:bg-slate-800/80'
                         }`}
                       >
-                        <p className="text-xs sm:text-sm font-bold leading-tight">{type.label}</p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">{type.desc}</p>
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-black uppercase ${
+                              isSelected ? 'bg-red-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                            }`}>
+                              {type.letter}
+                            </span>
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                              isSelected ? 'bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                            }`}>
+                              <IconComp size={15} />
+                            </div>
+                          </div>
+                          <p className="text-sm font-extrabold leading-tight text-slate-900 dark:text-white">
+                            {type.label}
+                          </p>
+                          <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-1 ${
+                            isSelected ? 'bg-red-200/80 dark:bg-red-900/60 text-red-900 dark:text-red-200' : 'bg-slate-200/70 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                          }`}>
+                            {type.tag}
+                          </span>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-snug">
+                            {type.desc}
+                          </p>
+                        </div>
+                        {isSelected && (
+                          <div className="mt-2.5 pt-2 border-t border-red-200/60 dark:border-red-900/40 flex items-center gap-1 text-[11px] font-bold text-red-600 dark:text-red-400">
+                            <CheckCircle2 size={13} />
+                            <span>Selected</span>
+                          </div>
+                        )}
                       </button>
                     );
                   })}

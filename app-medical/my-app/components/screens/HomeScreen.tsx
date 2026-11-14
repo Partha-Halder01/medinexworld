@@ -683,10 +683,10 @@ export const HomeScreen = () => {
             {/* Image Overlay Title */}
             <div className="absolute bottom-3 left-3.5 right-3.5">
               <h3 className="font-black text-lg sm:text-xl text-white leading-tight drop-shadow-sm">
-                Ambulance Booking & Enquiry
+                Ambulance Services & Booking
               </h3>
               <p className="text-red-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
-                Emergency dispatch & planned ICU transfers with oxygen support
+                Normal, ICU & Air Ambulance transfers with emergency support
               </p>
             </div>
           </div>
@@ -694,8 +694,25 @@ export const HomeScreen = () => {
           {/* Card Body */}
           <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              Equipped BLS & ALS ambulances with GPS tracking, emergency life support, and prompt doorstep arrival.
+              Equipped with GPS tracking, oxygen & ventilator life support, and prompt dispatch for local & outstation emergencies.
             </p>
+
+            {/* 3 Ambulance Services Indicator Badges */}
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              <span className="text-[11px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
+                <span>🚑</span>
+                <span>Normal Ambulance</span>
+              </span>
+              <span className="text-[11px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
+                <span>🏥</span>
+                <span>ICU Ambulance</span>
+              </span>
+              <span className="text-[11px] font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/70 dark:border-red-800/60 flex items-center gap-1">
+                <span>🚁</span>
+                <span>Air Ambulance</span>
+              </span>
+            </div>
+
             <div className="mt-3 pt-3 border-t border-red-100 dark:border-red-900/30 flex items-center justify-between">
               <span className="text-xs sm:text-sm font-extrabold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                 Request Ambulance Now <ArrowRight size={14} />
