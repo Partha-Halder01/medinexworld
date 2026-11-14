@@ -189,6 +189,7 @@ export const DoctorAppointmentsScreen = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                  <th className="text-left px-5 py-4 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Serial #</th>
                   <th className="text-left px-6 py-4 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Patient</th>
                   <th className="text-left px-6 py-4 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Date & Time</th>
                   <th className="text-left px-6 py-4 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Type</th>
@@ -201,6 +202,11 @@ export const DoctorAppointmentsScreen = () => {
               <tbody className="divide-y divide-gray-50 dark:divide-gray-700/50">
                 {filtered.slice().reverse().map((apt: any) => (
                   <tr key={apt._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                    <td className="px-5 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-black text-xs shadow-2xs">
+                        Serial #{apt.serialNumber || 1}
+                      </span>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
@@ -322,9 +328,14 @@ export const DoctorAppointmentsScreen = () => {
                       </p>
                     )}
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full shrink-0 ${statusBadge(apt.status)}`}>
-                    {apt.status}
-                  </span>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200 font-black text-[10px] border border-emerald-300 dark:border-emerald-800">
+                      Serial #{apt.serialNumber || 1}
+                    </span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusBadge(apt.status)}`}>
+                      {apt.status}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-2">

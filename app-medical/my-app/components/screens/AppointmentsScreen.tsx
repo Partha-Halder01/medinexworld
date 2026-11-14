@@ -153,6 +153,22 @@ export const AppointmentsScreen = () => {
 
             return (
               <div key={apt._id} className="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col gap-4 transition-all hover:shadow-xl hover:shadow-blue-500/5 group">
+                {/* Daily Serial / Token Banner */}
+                <div className="flex items-center justify-between gap-2 px-3 py-2 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/40 rounded-2xl border border-emerald-200/80 dark:border-emerald-800/60">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                      Booking Serial Number
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Token</span>
+                    <span className="px-2.5 py-0.5 rounded-xl bg-emerald-600 text-white font-black text-sm shadow-xs">
+                      #{apt.serialNumber || 1}
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-gray-700 overflow-hidden border border-gray-100 dark:border-gray-600 flex items-center justify-center shrink-0">

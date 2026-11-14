@@ -160,6 +160,7 @@ model Appointment {
   chamberName         String?
   chamberAddress      String?   @db.Text
   visitDate           String?   @db.VarChar(10)
+  serialNumber        Int?      @default(1)
   bookingFee          Float     @default(0)
   bookingFeePaid      Boolean   @default(false)
   paymentMethod       String    @default("cash")

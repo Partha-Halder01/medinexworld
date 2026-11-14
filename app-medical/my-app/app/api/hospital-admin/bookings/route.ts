@@ -54,6 +54,7 @@ export async function GET(req: Request) {
     const formatted = appointments.map((a) => ({
       ...a,
       _id: a.id,
+      serialNumber: a.serialNumber || 1,
       patientId: a.patient ? { ...a.patient, _id: a.patient.id } : null,
       doctorId: a.doctor ? { ...a.doctor, _id: a.doctor.id } : null,
       hospitalId: a.hospital ? { ...a.hospital, _id: a.hospital.id } : null,

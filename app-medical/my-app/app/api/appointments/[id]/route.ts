@@ -40,6 +40,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const { password: _password, authOtpHash: _otp, ...doctor } = rawDoctor || {};
     return NextResponse.json({
       ...rest, _id: rest.id,
+      serialNumber: rest.serialNumber || 1,
       patientId: patient ? { ...patient, _id: patient.id } : rest.patientId,
       chamber: chamber ? serializeChamber(chamber) : null,
       doctorId: rawDoctor ? { ...doctor, _id: doctor.id, location: doctor.locationLat != null ? { lat: doctor.locationLat, lng: doctor.locationLng } : null } : rest.doctorId,

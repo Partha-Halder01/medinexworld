@@ -221,7 +221,12 @@ export const DoctorDashboardScreen = () => {
                     <MapPin size={16} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{apt.patientId?.name || 'Patient'}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{apt.patientId?.name || 'Patient'}</p>
+                      <span className="px-1.5 py-0.2 rounded-md bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] shrink-0">
+                        Serial #{apt.serialNumber || 1}
+                      </span>
+                    </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><Clock size={11} /> {apt.date} · {apt.slot}</p>
                   </div>
                   <span className={`text-[10px] sm:text-xs px-2 py-1 rounded-full font-bold shrink-0 ${

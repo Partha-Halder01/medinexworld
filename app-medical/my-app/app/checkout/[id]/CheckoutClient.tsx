@@ -423,9 +423,20 @@ export default function CheckoutClient() {
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
                   Booking Confirmed!
                 </h2>
-                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider mb-4">
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider mb-3">
                   Slot Reserved &amp; Scheduled
                 </p>
+
+                {/* Patient Daily Serial Token */}
+                <div className="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl p-3 mb-4 flex items-center justify-between w-full">
+                  <div className="text-left">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Your Daily Visit Serial</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold">Queue token for {appointment.date}</p>
+                  </div>
+                  <span className="px-3 py-1 rounded-xl bg-emerald-600 text-white font-black text-base shadow-xs">
+                    Serial #{appointment.serialNumber || 1}
+                  </span>
+                </div>
 
                 <div className="bg-slate-50 dark:bg-slate-800/80 w-full p-4.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 text-left space-y-2">
                   <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 font-semibold leading-relaxed">
@@ -570,25 +581,35 @@ export default function CheckoutClient() {
                   </div>
                 </div>
 
-                {/* Schedule Grid */}
-                <div className="grid grid-cols-2 gap-3.5 mb-4">
-                  <div className="p-4 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200/70 dark:border-slate-800">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-2.5">
+                {/* Schedule Grid with Daily Serial Number */}
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 mb-4">
+                  <div className="p-3 sm:p-4 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200/70 dark:border-slate-800">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-2">
                       <Calendar size={16} />
                     </div>
                     <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Date</p>
-                    <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
+                    <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">
                       {appointment.date}
                     </p>
                   </div>
 
-                  <div className="p-4 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200/70 dark:border-slate-800">
-                    <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2.5">
+                  <div className="p-3 sm:p-4 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200/70 dark:border-slate-800">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2">
                       <Clock size={16} />
                     </div>
                     <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Time Slot</p>
-                    <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
+                    <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">
                       {appointment.slot}
+                    </p>
+                  </div>
+
+                  <div className="p-3 sm:p-4 bg-emerald-50/70 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/60">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mb-2 font-black text-xs">
+                      #{appointment.serialNumber || 1}
+                    </div>
+                    <p className="text-[10px] font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Daily Token</p>
+                    <p className="text-xs sm:text-sm font-black text-emerald-800 dark:text-emerald-200 mt-0.5 truncate">
+                      Serial #{appointment.serialNumber || 1}
                     </p>
                   </div>
                 </div>

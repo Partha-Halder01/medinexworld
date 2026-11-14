@@ -9,6 +9,7 @@ function apptToResponse(a: any) {
   return {
     ...a,
     _id: a.id,
+    serialNumber: a.serialNumber || 1,
     patientId: a.patient ? { ...a.patient, _id: a.patient.id } : a.patientId,
     doctorId: a.doctor ? { ...a.doctor, _id: a.doctor.id, location: a.doctor.locationLat != null ? { lat: a.doctor.locationLat, lng: a.doctor.locationLng } : null } : a.doctorId,
     hospitalId: a.hospital ? { ...a.hospital, _id: a.hospital.id, location: a.hospital.locationLat != null ? { lat: a.hospital.locationLat, lng: a.hospital.locationLng } : null } : a.hospitalId,
@@ -94,11 +95,28 @@ export async function POST(req: Request) {
       }
     }
 
+    // Calculate daily booking serial number (1 to N) for this date
+    const dateStr = typeof date === 'string' ? date : '';
+    const visitDateStr = typeof visitDate === 'string' ? visitDate : '';
+    const dateFilters: any[] = [];
+    if (visitDateStr) dateFilters.push({ visitDate: visitDateStr });
+    if (dateStr) dateFilters.push({ date: dateStr });
+
+    const existingSameDayCount = await prisma.appointment.count({
+      where: {
+        status: { not: 'Cancelled' },
+        ...(dId ? { doctorId: dId } : hId ? { hospitalId: hId } : {}),
+        ...(dateFilters.length > 0 ? { OR: dateFilters } : {}),
+      },
+    });
+    const serialNumber = existingSameDayCount + 1;
+
     const appointment = await prisma.appointment.create({
       data: {
         patientId: pId, doctorId: dId, hospitalId: hId,
         serviceType: serviceType || 'doctor', serviceName: serviceName || '',
         slot, date, type, basePrice, price: finalPrice, paidAmount: 0,
+        serialNumber,
         platformFeePercent, platformFeeAmount,
         paymentMethod: 'online', paymentStatus: 'pending', status: 'Confirmed',
       },
@@ -143,12 +161,28 @@ async function createChamberAppointment(patientId: number, doctorId: number, cha
   const bookingFee = await getChamberBookingFee();
   const consultationFee = Math.max(0, Number(chamber.fee) || 0);
 
+  // Calculate daily serial number (1 to N) for this doctor / chamber on this date
+  const visitDateStr = String(visitDate);
+  const formattedDate = formatDateLabel(visitDate as string);
+  const existingSameDayCount = await prisma.appointment.count({
+    where: {
+      status: { not: 'Cancelled' },
+      doctorId,
+      OR: [
+        { visitDate: visitDateStr },
+        { date: formattedDate },
+      ],
+    },
+  });
+  const serialNumber = existingSameDayCount + 1;
+
   const appointment = await prisma.appointment.create({
     data: {
       patientId, doctorId, chamberId,
       serviceType: 'doctor', serviceName: '',
-      slot, date: formatDateLabel(visitDate), visitDate, type: 'clinic',
+      slot, date: formattedDate, visitDate: visitDateStr, type: 'clinic',
       chamberName: chamber.name, chamberAddress: chamber.address,
+      serialNumber,
       basePrice: consultationFee, price: consultationFee + bookingFee, paidAmount: 0,
       bookingFee, bookingFeePaid: bookingFee <= 0,
       platformFeePercent: 0, platformFeeAmount: bookingFee,

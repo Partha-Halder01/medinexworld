@@ -141,15 +141,15 @@ function BookingsTab({ ownerId, bookings, setBookings, showToast, onBookingUpdat
           <div key={booking._id} className="bg-white dark:bg-gray-800 p-3 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xs flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-1">
+                <span className="px-1.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-extrabold text-[9px] shrink-0">
+                  Serial #{booking.serialNumber || 1}
+                </span>
                 <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider truncate ${
                   booking.status === 'Completed' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
                   booking.status === 'Cancelled' ? 'bg-red-50 text-red-500 dark:bg-red-900/30 dark:text-red-400' :
                   'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
                 }`}>
                   {booking.status}
-                </span>
-                <span className="text-[10px] font-black text-gray-900 dark:text-white">
-                  ₹{booking.paymentMethod === 'chamber' ? (booking.basePrice || 0) : (booking.price || 0)}
                 </span>
               </div>
 
@@ -222,6 +222,7 @@ function BookingsTab({ ownerId, bookings, setBookings, showToast, onBookingUpdat
           <table className="w-full text-left">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-700/50">
+                <th className="px-5 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Serial #</th>
                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Patient</th>
                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Service / Doctor</th>
                 <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Schedule</th>
@@ -232,6 +233,11 @@ function BookingsTab({ ownerId, bookings, setBookings, showToast, onBookingUpdat
             <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
               {filtered.map((booking: any) => (
                 <tr key={booking._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all">
+                  <td className="px-5 py-5 whitespace-nowrap">
+                    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-black text-xs">
+                      Serial #{booking.serialNumber || 1}
+                    </span>
+                  </td>
                   <td className="px-6 py-5">
                     <p className="text-sm font-black text-gray-900 dark:text-white">{booking.patientId?.name || 'Patient'}</p>
                     <p className="text-[10px] font-bold text-gray-400 mt-0.5">{booking.patientId?.phone || 'No phone'}</p>
@@ -941,7 +947,12 @@ export const HospitalAdminScreen = () => {
                           {(b.patientId?.name || 'P')[0]}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-gray-900 truncate">{b.patientId?.name || 'Patient'}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-bold text-gray-900 truncate">{b.patientId?.name || 'Patient'}</p>
+                            <span className="px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 font-extrabold text-[9px] shrink-0">
+                              #{b.serialNumber || 1}
+                            </span>
+                          </div>
                           <p className="text-[11px] text-gray-500 truncate">{b.doctorId?.name || b.serviceName || 'Visit'} · {b.date} {b.slot}</p>
                         </div>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${

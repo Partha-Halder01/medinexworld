@@ -242,6 +242,7 @@ export const AdminAppointmentsScreen = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                  <th className="text-left px-4 py-3.5 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Serial #</th>
                   <th className="text-left px-5 py-3.5 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Patient</th>
                   <th className="text-left px-5 py-3.5 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Doctor</th>
                   <th className="text-left px-5 py-3.5 font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">Date & Time</th>
@@ -253,6 +254,11 @@ export const AdminAppointmentsScreen = () => {
               <tbody className="divide-y divide-gray-50 dark:divide-gray-700/50">
                 {filtered.map((apt: any) => (
                   <tr key={apt._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-black text-xs">
+                        #{apt.serialNumber || 1}
+                      </span>
+                    </td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0">
@@ -316,7 +322,12 @@ export const AdminAppointmentsScreen = () => {
                     <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{apt.doctorId?.name || 'Doctor'}</p>
                     <p className="text-[11px] text-gray-500">{apt.doctorId?.specialty}</p>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${statusBadge(apt.status)}`}>{apt.status}</span>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="px-1.5 py-0.2 rounded-md bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px]">
+                      Serial #{apt.serialNumber || 1}
+                    </span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusBadge(apt.status)}`}>{apt.status}</span>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-1.5">
