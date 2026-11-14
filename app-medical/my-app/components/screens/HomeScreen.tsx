@@ -8,7 +8,7 @@ import {
   User, Video, ChevronRight, CalendarDays, ArrowRight,
   Building2, Search, Star, ShieldCheck, FileText, CheckCircle2,
   Stethoscope as StethoscopeIcon, PhoneCall, Siren, FlaskConical, X, Mail,
-  Pill, Truck, PackageCheck
+  Pill, Truck, PackageCheck, HeartHandshake
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/app/context/AppContext';
@@ -19,6 +19,7 @@ import { BrandLogo } from '../ui/BrandLogo';
 import { TestReportEnquiryModal } from '@/components/screens/enquiry/TestReportEnquiryModal';
 import { AmbulanceEnquiryModal } from '@/components/screens/enquiry/AmbulanceEnquiryModal';
 import { MedicineDeliveryModal } from '@/components/screens/enquiry/MedicineDeliveryModal';
+import { HomeCareEnquiryModal } from '@/components/screens/enquiry/HomeCareEnquiryModal';
 import { SPECIALTIES } from '@/lib/data';
 import Link from 'next/link';
 
@@ -88,6 +89,7 @@ export const HomeScreen = () => {
   const [showTestModal, setShowTestModal] = useState(false);
   const [showAmbulanceModal, setShowAmbulanceModal] = useState(false);
   const [showMedicineModal, setShowMedicineModal] = useState(false);
+  const [showHomeCareModal, setShowHomeCareModal] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -657,8 +659,8 @@ export const HomeScreen = () => {
         ))}
       </section>
 
-      {/* ── 🚑 🧪 💊 3 CORE HEALTHCARE ACTION SERVICES (Ambulance + Lab Reports + Medicine Door Delivery with Brand Logo) ── */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5">
+      {/* ── 🚑 🧪 💊 🏡 4 CORE HEALTHCARE ACTION SERVICES (Ambulance + Diagnostic Services + Medicine Door Delivery + Home Care Service with Brand Logo) ── */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         {/* 1. Ambulance Services Card */}
         <div 
           onClick={() => setShowAmbulanceModal(true)}
@@ -875,6 +877,89 @@ export const HomeScreen = () => {
               </span>
               <span className="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-200/60 dark:border-blue-800/60">
                 ⚡ Fast Doorstep
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Home Care Service Card (NEW with Brand Logo) */}
+        <div 
+          onClick={() => setShowHomeCareModal(true)}
+          className="group relative overflow-hidden bg-white dark:bg-slate-850 rounded-2xl sm:rounded-3xl border border-purple-200/90 dark:border-purple-900/60 shadow-xs hover:shadow-xl hover:border-purple-500/60 transition-all cursor-pointer flex flex-col justify-between"
+        >
+          {/* Header Image with Gradient Overlay & Brand Logo */}
+          <div className="relative w-full h-36 sm:h-44 overflow-hidden bg-slate-900">
+            <img
+              src="/images/home_care_service.jpg"
+              alt="Home Care Service - Physiotherapy, Elderly & Nursing Care"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+            
+            {/* Floating Top Bar: Icon + Category Badge + Brand Logo */}
+            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-md shadow-purple-600/40">
+                  <HeartHandshake size={18} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-purple-600/95 text-white px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 backdrop-blur-xs">
+                  <span>🏡 Home Care</span>
+                </span>
+              </div>
+              
+              {/* Brand Logo Badge */}
+              <div className="flex items-center bg-white/95 dark:bg-slate-900/95 px-2.5 py-1 rounded-xl shadow-md border border-white/50 backdrop-blur-md shrink-0">
+                <Image src="/newlogos.png" alt="Medinex World" width={68} height={22} className="h-4 w-auto object-contain" priority />
+              </div>
+            </div>
+
+            {/* Image Overlay Title */}
+            <div className="absolute bottom-3 left-3.5 right-3.5">
+              <h3 className="font-black text-lg sm:text-xl text-white leading-tight drop-shadow-sm">
+                Home Care Service
+              </h3>
+              <p className="text-purple-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
+                Physiotherapy, Attendants & Emergency Dr. Check-up
+              </p>
+            </div>
+          </div>
+
+          {/* Card Body */}
+          <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Compassionate clinical & elderly care right at your doorstep with verified physiotherapists, nurses, attendants & visiting doctors.
+            </p>
+
+            {/* 5 Home Care Services Badges */}
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-lg border border-purple-200/70 dark:border-purple-800/60 flex items-center gap-1">
+                <span>✅</span>
+                <span>Physiotherapy</span>
+              </span>
+              <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-lg border border-purple-200/70 dark:border-purple-800/60 flex items-center gap-1">
+                <span>✅</span>
+                <span>Patient Attendant Care</span>
+              </span>
+              <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-lg border border-purple-200/70 dark:border-purple-800/60 flex items-center gap-1">
+                <span>✅</span>
+                <span>Old age People Care</span>
+              </span>
+              <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-lg border border-purple-200/70 dark:border-purple-800/60 flex items-center gap-1">
+                <span>✅</span>
+                <span>Emergency Dr. Check-up</span>
+              </span>
+              <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-lg border border-purple-200/70 dark:border-purple-800/60 flex items-center gap-1">
+                <span>✅</span>
+                <span>Dressing</span>
+              </span>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-purple-100 dark:border-purple-900/30 flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-extrabold text-purple-600 dark:text-purple-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Book Home Care Now <ArrowRight size={14} />
+              </span>
+              <span className="text-[10px] font-extrabold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-md border border-purple-200/60 dark:border-purple-800/60">
+                🏡 Doorstep Visit
               </span>
             </div>
           </div>
@@ -1171,6 +1256,10 @@ export const HomeScreen = () => {
       <MedicineDeliveryModal
         isOpen={showMedicineModal}
         onClose={() => setShowMedicineModal(false)}
+      />
+      <HomeCareEnquiryModal
+        isOpen={showHomeCareModal}
+        onClose={() => setShowHomeCareModal(false)}
       />
 
     </div>

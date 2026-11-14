@@ -24,13 +24,15 @@ import {
   ArrowRight,
   Pill,
   Truck,
-  Download
+  Download,
+  HeartHandshake
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/app/context/AppContext';
 import { TestReportEnquiryModal } from '@/components/screens/enquiry/TestReportEnquiryModal';
 import { AmbulanceEnquiryModal } from '@/components/screens/enquiry/AmbulanceEnquiryModal';
 import { MedicineDeliveryModal } from '@/components/screens/enquiry/MedicineDeliveryModal';
+import { HomeCareEnquiryModal } from '@/components/screens/enquiry/HomeCareEnquiryModal';
 
 export const UserEnquiriesScreen = () => {
   const router = useRouter();
@@ -38,7 +40,7 @@ export const UserEnquiriesScreen = () => {
 
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'ambulance' | 'test_report'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'ambulance' | 'test_report' | 'medicine' | 'home_care'>('all');
 
   // Guest tracking state
   const [trackingPhone, setTrackingPhone] = useState<string>('');
@@ -48,6 +50,8 @@ export const UserEnquiriesScreen = () => {
   // Modals
   const [showTestModal, setShowTestModal] = useState(false);
   const [showAmbulanceModal, setShowAmbulanceModal] = useState(false);
+  const [showMedicineModal, setShowMedicineModal] = useState(false);
+  const [showHomeCareModal, setShowHomeCareModal] = useState(false);
   
   // Image preview modal
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -238,7 +242,27 @@ export const UserEnquiriesScreen = () => {
                   : 'text-slate-600 dark:text-slate-400 hover:bg-teal-50 dark:hover:bg-teal-950/30'
               }`}
             >
-              <FlaskConical size={14} /> Test Reports ({enquiries.filter((e) => e.type === 'test_report').length})
+              <FlaskConical size={14} /> Diagnostic ({enquiries.filter((e) => e.type === 'test_report').length})
+            </button>
+            <button
+              onClick={() => setActiveTab('medicine')}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
+                activeTab === 'medicine'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-950/30'
+              }`}
+            >
+              <Pill size={14} /> Medicine ({enquiries.filter((e) => e.type === 'medicine').length})
+            </button>
+            <button
+              onClick={() => setActiveTab('home_care')}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
+                activeTab === 'home_care'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-950/30'
+              }`}
+            >
+              <HeartHandshake size={14} /> Home Care ({enquiries.filter((e) => e.type === 'home_care').length})
             </button>
           </div>
         )}
@@ -329,6 +353,7 @@ export const UserEnquiriesScreen = () => {
             {filtered.map((enquiry) => {
               const isAmbulance = enquiry.type === 'ambulance';
               const isMedicine = enquiry.type === 'medicine';
+              const isHomeCare = enquiry.type === 'home_care';
               const status = getStatusBadge(enquiry.status);
 
               return (
@@ -345,15 +370,17 @@ export const UserEnquiriesScreen = () => {
                             ? 'bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400'
                             : isMedicine
                             ? 'bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400'
+                            : isHomeCare
+                            ? 'bg-purple-100 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400'
                             : 'bg-teal-100 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400'
                         }`}
                       >
-                        {isAmbulance ? <Siren size={20} /> : isMedicine ? <Pill size={20} /> : <FlaskConical size={20} />}
+                        {isAmbulance ? <Siren size={20} /> : isMedicine ? <Pill size={20} /> : isHomeCare ? <HeartHandshake size={20} /> : <FlaskConical size={20} />}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
-                            {isAmbulance ? `Ambulance: ${enquiry.ambulanceType || 'Rapid Transfer'}` : isMedicine ? 'Medicine Door Delivery' : enquiry.testName}
+                            {isAmbulance ? `Ambulance: ${enquiry.ambulanceType || 'Rapid Transfer'}` : isMedicine ? 'Medicine Door Delivery' : isHomeCare ? `Home Care: ${enquiry.testName || 'Care Services'}` : enquiry.testName}
                           </h3>
                           <span className="text-xs font-bold text-slate-400">#{enquiry.id}</span>
                         </div>
@@ -453,6 +480,65 @@ export const UserEnquiriesScreen = () => {
                               className="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-bold hover:underline"
                             >
                               <ExternalLink size={14} /> View Attached Prescription
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    ) : isHomeCare ? (
+                      <>
+                        <div className="space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                          <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <MapPin size={13} className="text-purple-600" /> Patient Home Address
+                          </p>
+                          <p className="text-slate-800 dark:text-slate-200 font-medium">
+                            {enquiry.pickupAddress}
+                          </p>
+                        </div>
+
+                        {enquiry.testName && (
+                          <div className="space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                              <HeartHandshake size={13} className="text-purple-600" /> Selected Services
+                            </p>
+                            <p className="text-slate-800 dark:text-slate-200 font-bold">
+                              {enquiry.testName}
+                            </p>
+                          </div>
+                        )}
+
+                        {enquiry.patientCondition && (
+                          <div className="sm:col-span-2 space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+                              Package / Schedule Details
+                            </p>
+                            <p className="text-slate-700 dark:text-slate-300">
+                              {enquiry.patientCondition}
+                            </p>
+                          </div>
+                        )}
+
+                        {enquiry.reportText && (
+                          <div className="sm:col-span-2 space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+                              Care Instructions & Requirements
+                            </p>
+                            <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line">
+                              {enquiry.reportText}
+                            </p>
+                          </div>
+                        )}
+
+                        {enquiry.fileData && (
+                          <div className="sm:col-span-2 space-y-1 bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                            <p className="font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                              <FileText size={13} className="text-purple-600" /> Attached Medical Document
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setPreviewImage(enquiry.fileData)}
+                              className="inline-flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-bold hover:underline"
+                            >
+                              <ExternalLink size={14} /> View Attached Document
                             </button>
                           </div>
                         )}
@@ -639,6 +725,22 @@ export const UserEnquiriesScreen = () => {
       <AmbulanceEnquiryModal
         isOpen={showAmbulanceModal}
         onClose={() => setShowAmbulanceModal(false)}
+        onSuccess={() => {
+          if (currentUser?._id) fetchUserEnquiries(currentUser._id);
+          else if (trackingPhone) fetchGuestEnquiries(trackingPhone);
+        }}
+      />
+      <MedicineDeliveryModal
+        isOpen={showMedicineModal}
+        onClose={() => setShowMedicineModal(false)}
+        onSuccess={() => {
+          if (currentUser?._id) fetchUserEnquiries(currentUser._id);
+          else if (trackingPhone) fetchGuestEnquiries(trackingPhone);
+        }}
+      />
+      <HomeCareEnquiryModal
+        isOpen={showHomeCareModal}
+        onClose={() => setShowHomeCareModal(false)}
         onSuccess={() => {
           if (currentUser?._id) fetchUserEnquiries(currentUser._id);
           else if (trackingPhone) fetchGuestEnquiries(trackingPhone);

@@ -35,7 +35,8 @@ import {
   ClipboardList,
   Pill,
   PackageCheck,
-  Download
+  Download,
+  HeartHandshake
 } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
 
@@ -49,11 +50,12 @@ export const AdminEnquiriesScreen = () => {
     ambulanceTotal: 0,
     urgentAmbulance: 0,
     medicineTotal: 0,
+    homeCareTotal: 0,
   });
   const [loading, setLoading] = useState(true);
 
   // Filters
-  const [typeFilter, setTypeFilter] = useState<'all' | 'ambulance' | 'test_report' | 'medicine'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'ambulance' | 'test_report' | 'medicine' | 'home_care'>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   // "Urgent ambulances" card: emergency ambulance requests that are still pending.
@@ -457,7 +459,7 @@ export const AdminEnquiriesScreen = () => {
               <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-black ${
                 typeFilter === 'test_report' ? 'bg-white/20 text-white' : 'bg-slate-200/70 dark:bg-slate-700'
               }`}>
-                {Math.max(0, stats.total - stats.ambulanceTotal - (stats.medicineTotal || 0))}
+                {Math.max(0, stats.total - stats.ambulanceTotal - (stats.medicineTotal || 0) - (stats.homeCareTotal || 0))}
               </span>
             </button>
 
@@ -475,6 +477,23 @@ export const AdminEnquiriesScreen = () => {
                 typeFilter === 'medicine' ? 'bg-white/20 text-white' : 'bg-slate-200/70 dark:bg-slate-700'
               }`}>
                 {stats.medicineTotal || 0}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setTypeFilter('home_care')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                typeFilter === 'home_care'
+                  ? 'bg-purple-600 text-white shadow-2xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-purple-600'
+              }`}
+            >
+              <HeartHandshake size={13} />
+              <span>Home Care</span>
+              <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-black ${
+                typeFilter === 'home_care' ? 'bg-white/20 text-white' : 'bg-slate-200/70 dark:bg-slate-700'
+              }`}>
+                {stats.homeCareTotal || 0}
               </span>
             </button>
           </div>
@@ -530,6 +549,7 @@ export const AdminEnquiriesScreen = () => {
           {enquiries.filter(e => !urgentActive || e.urgency === 'emergency').map((enquiry) => {
             const isAmbulance = enquiry.type === 'ambulance';
             const isMedicine = enquiry.type === 'medicine';
+            const isHomeCare = enquiry.type === 'home_care';
             const isUrgent = isAmbulance && enquiry.urgency === 'emergency';
             const status = getStatusBadge(enquiry.status);
             const isGuest = !enquiry.userId;
@@ -537,7 +557,7 @@ export const AdminEnquiriesScreen = () => {
             // Clean phone for links
             const cleanPhone = (enquiry.patientPhone || '').replace(/[^0-9]/g, '');
             const waNumber = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-            const serviceName = isAmbulance ? 'Ambulance' : isMedicine ? 'Medicine Door Delivery' : 'Diagnostic Test';
+            const serviceName = isAmbulance ? 'Ambulance' : isMedicine ? 'Medicine Door Delivery' : isHomeCare ? 'Home Care Service' : 'Diagnostic Test';
             const waText = enquiry.followUpMessage
               ? `Hello ${enquiry.patientName}, Medinex update regarding your ${serviceName} request (#${enquiry.id}): ${enquiry.followUpMessage}${enquiry.quoteAmount ? ` (Total: ₹${enquiry.quoteAmount})` : ''}`
               : `Hello ${enquiry.patientName}, regarding your Medinex ${serviceName} request (#${enquiry.id}).`;
@@ -561,6 +581,8 @@ export const AdminEnquiriesScreen = () => {
                           ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/50'
                           : isMedicine
                           ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/50'
+                          : isHomeCare
+                          ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-900/50'
                           : 'bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200/60 dark:border-teal-900/50'
                       }`}
                     >
@@ -568,6 +590,8 @@ export const AdminEnquiriesScreen = () => {
                         <Siren size={22} className={isUrgent ? 'animate-pulse' : ''} />
                       ) : isMedicine ? (
                         <Pill size={22} />
+                      ) : isHomeCare ? (
+                        <HeartHandshake size={22} />
                       ) : (
                         <FlaskConical size={22} />
                       )}
@@ -576,7 +600,7 @@ export const AdminEnquiriesScreen = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white leading-tight truncate">
-                          {isAmbulance ? (enquiry.ambulanceType || 'Ambulance Service') : isMedicine ? 'Medicine Door Delivery' : (enquiry.testName || 'Diagnostic Test Enquiry')}
+                          {isAmbulance ? (enquiry.ambulanceType || 'Ambulance Service') : isMedicine ? 'Medicine Door Delivery' : isHomeCare ? (enquiry.testName || 'Home Care Service') : (enquiry.testName || 'Diagnostic Test Enquiry')}
                         </h3>
                         {isUrgent && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-rose-600 text-white px-2.5 py-0.5 rounded-full shadow-xs animate-pulse">
@@ -719,7 +743,7 @@ export const AdminEnquiriesScreen = () => {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                          {isAmbulance ? 'Emergency Route & Condition' : isMedicine ? 'Medicine Delivery Address & Requirements' : 'Diagnostic Test Particulars'}
+                          {isAmbulance ? 'Emergency Route & Condition' : isMedicine ? 'Medicine Delivery Address & Requirements' : isHomeCare ? 'Home Care Address & Care Requirements' : 'Diagnostic Test Particulars'}
                         </span>
                         {enquiry.scheduledTime && (
                           <span className="text-[11px] font-bold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded-md border border-teal-200/60 dark:border-teal-800/40">
@@ -828,6 +852,78 @@ export const AdminEnquiriesScreen = () => {
                             >
                               <FileText size={13} />
                               <span>View Uploaded Doctor's Prescription</span>
+                            </button>
+                          )}
+                        </div>
+                      ) : isHomeCare ? (
+                        <div className="space-y-2.5">
+                          {/* Home Care Address, Services & Patient Condition */}
+                          <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700 space-y-2">
+                            <div className="flex items-start gap-2.5">
+                              <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shrink-0 mt-1 shadow-xs ring-4 ring-purple-100 dark:ring-purple-950" />
+                              <div className="min-w-0 flex-1">
+                                <span className="text-[10px] uppercase font-black text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                                  <MapPin size={11} /> Patient Home Address
+                                </span>
+                                <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                                  {enquiry.pickupAddress || 'Address on record'}
+                                </p>
+                              </div>
+                              {enquiry.pickupLat && enquiry.pickupLng && (
+                                <a 
+                                  href={`https://www.google.com/maps?q=${enquiry.pickupLat},${enquiry.pickupLng}`} 
+                                  target="_blank" 
+                                  rel="noreferrer"
+                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-600 hover:underline bg-purple-50 dark:bg-purple-950/40 px-2 py-1 rounded-lg shrink-0"
+                                >
+                                  <Navigation size={11} />
+                                  <span>Maps</span>
+                                </a>
+                              )}
+                            </div>
+
+                            {enquiry.testName && (
+                              <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                <span className="text-[10px] font-black uppercase text-purple-600 dark:text-purple-400">
+                                  Selected Home Care Services:
+                                </span>
+                                <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
+                                  {enquiry.testName}
+                                </p>
+                              </div>
+                            )}
+
+                            {enquiry.patientCondition && (
+                              <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                <span className="text-[10px] font-black uppercase text-slate-400">
+                                  Patient Condition / Package:
+                                </span>
+                                <p className="text-xs text-slate-700 dark:text-slate-300 font-medium mt-0.5">
+                                  {enquiry.patientCondition}
+                                </p>
+                              </div>
+                            )}
+
+                            {enquiry.reportText && (
+                              <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                <span className="text-[10px] font-black uppercase text-slate-400">
+                                  Patient Notes / Instructions:
+                                </span>
+                                <p className="text-xs text-slate-800 dark:text-slate-200 font-medium mt-0.5 whitespace-pre-line">
+                                  {enquiry.reportText}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {enquiry.fileData && (
+                            <button
+                              type="button"
+                              onClick={() => setPreviewDoc({ url: enquiry.fileData, title: `${enquiry.patientName} - Medical Document / Prescription` })}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 rounded-xl font-bold text-xs hover:bg-purple-100 transition-colors shadow-2xs"
+                            >
+                              <FileText size={13} />
+                              <span>View Uploaded Medical Document / Prescription</span>
                             </button>
                           )}
                         </div>

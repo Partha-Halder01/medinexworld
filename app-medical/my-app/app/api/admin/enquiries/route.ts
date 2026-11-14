@@ -32,7 +32,7 @@ export async function GET(req: Request) {
       ];
     }
 
-    const [enquiries, totalCount, pendingCount, ambulanceCount, urgentAmbulanceCount, medicineCount] = await Promise.all([
+    const [enquiries, totalCount, pendingCount, ambulanceCount, urgentAmbulanceCount, medicineCount, homeCareCount] = await Promise.all([
       prisma.enquiry.findMany({
         where,
         orderBy: [
@@ -45,6 +45,7 @@ export async function GET(req: Request) {
       prisma.enquiry.count({ where: { type: 'ambulance' } }),
       prisma.enquiry.count({ where: { type: 'ambulance', urgency: 'emergency', status: 'pending' } }),
       prisma.enquiry.count({ where: { type: 'medicine' } }),
+      prisma.enquiry.count({ where: { type: 'home_care' } }),
     ]);
 
     return NextResponse.json({
@@ -55,6 +56,7 @@ export async function GET(req: Request) {
         ambulanceTotal: ambulanceCount,
         urgentAmbulance: urgentAmbulanceCount,
         medicineTotal: medicineCount,
+        homeCareTotal: homeCareCount,
       },
     });
   } catch (error: any) {

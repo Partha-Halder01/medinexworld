@@ -29,8 +29,8 @@ export async function POST(req: Request) {
       patientCondition,
     } = body;
 
-    if (!type || (type !== 'test_report' && type !== 'ambulance' && type !== 'medicine')) {
-      return NextResponse.json({ error: 'Valid inquiry type (test_report, ambulance, or medicine) is required.' }, { status: 400 });
+    if (!type || (type !== 'test_report' && type !== 'ambulance' && type !== 'medicine' && type !== 'home_care')) {
+      return NextResponse.json({ error: 'Valid inquiry type (test_report, ambulance, medicine, or home_care) is required.' }, { status: 400 });
     }
 
     if (!patientName || !patientName.trim()) {
@@ -48,6 +48,14 @@ export async function POST(req: Request) {
 
     if (type === 'medicine' && !pickupAddress?.trim()) {
       return NextResponse.json({ error: 'Delivery address is required for medicine door delivery.' }, { status: 400 });
+    }
+
+    if (type === 'home_care' && !pickupAddress?.trim()) {
+      return NextResponse.json({ error: 'Patient home address is required for home care service.' }, { status: 400 });
+    }
+
+    if (type === 'home_care' && !testName?.trim()) {
+      return NextResponse.json({ error: 'Please select at least one home care service.' }, { status: 400 });
     }
 
     if (type === 'medicine' && !reportText?.trim() && !fileData) {
