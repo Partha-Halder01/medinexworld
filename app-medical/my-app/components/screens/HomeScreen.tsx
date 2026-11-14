@@ -349,47 +349,49 @@ export const HomeScreen = () => {
         </div>
       </div>
 
-      {/* ── 🌟 CLEAN, AUTHENTIC HEALTHCARE HERO BANNER ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-teal-500/10 via-cyan-500/5 to-blue-500/5 dark:from-slate-850 dark:via-slate-850 dark:to-slate-900 rounded-2xl sm:rounded-3xl border border-teal-100/80 dark:border-slate-700/80 p-4 sm:p-6 md:p-8 lg:p-10 shadow-xs">
-        {/* Ambient background glow */}
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-teal-400/10 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-400/10 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* ── 🌟 REDESIGNED PREMIUM HEALTHCARE HERO CARD ── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-teal-500/[0.08] via-cyan-500/[0.04] to-emerald-500/[0.08] dark:from-slate-900 dark:via-slate-850 dark:to-teal-950/40 rounded-3xl border border-teal-200/70 dark:border-slate-700/80 p-4 sm:p-6 md:p-8 lg:p-9 shadow-sm">
+        {/* Soft Ambient Background Glows */}
+        <div className="absolute -top-20 -right-20 w-80 h-80 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
           {/* Left Hero Content */}
-          <div className="lg:col-span-7 space-y-3 sm:space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm sm:text-base font-bold bg-white/90 dark:bg-slate-800/90 text-teal-800 dark:text-teal-300 border border-teal-200/60 dark:border-teal-700/60 shadow-2xs backdrop-blur-xs">
+          <div className="lg:col-span-7 space-y-4">
+            {/* Trust Pill Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-extrabold bg-white/95 dark:bg-slate-800/90 text-teal-800 dark:text-teal-300 border border-teal-200/80 dark:border-teal-700/70 shadow-xs backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <CheckCircle2 size={16} className="text-teal-600 dark:text-teal-400" />
-              <span>Verified Doctors & Clinics</span>
+              <CheckCircle2 size={15} className="text-teal-600 dark:text-teal-400" />
+              <span>Verified Doctors & Instant Appointments</span>
             </div>
 
-            <h2 className="text-[27px] sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-[1.25] tracking-tight">
+            {/* Hero Main Heading */}
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-[1.2] tracking-tight">
               Find & Book Top Doctors <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">Near You</span>{' '}
               <span className="text-slate-400 dark:text-slate-500 font-normal text-lg sm:text-2xl">for</span>{' '}
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">In-Clinic Visits</span>
             </h2>
 
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
-              Book confirmed in-clinic appointments with verified medical specialists in your city.
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
+              Book confirmed in-clinic appointments with verified medical specialists in your city with guaranteed consultation slots.
             </p>
 
-            {/* Practical Search Box */}
+            {/* Modern Search Box */}
             <form onSubmit={handleSearchSubmit} className="pt-1">
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-700 p-2 sm:p-2.5 shadow-sm transition-all focus-within:shadow-md focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20">
                 {/* Mobile Location Micro-Row */}
-                <div className="flex sm:hidden items-center justify-between px-3 py-2 mb-1.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60">
+                <div className="flex sm:hidden items-center justify-between px-3 py-1.5 mb-1.5 bg-teal-50/70 dark:bg-slate-800/70 rounded-xl border border-teal-100 dark:border-slate-700/80">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <MapPin size={15} className="text-teal-600 shrink-0" />
-                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
+                    <MapPin size={14} className="text-teal-600 shrink-0" />
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
                       {formattedLocation || 'Near You'}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={requestCurrentLocation}
-                    className="text-sm font-bold text-teal-600 dark:text-teal-400 hover:underline shrink-0"
+                    className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline shrink-0"
                   >
                     {locationStatus === 'locating' ? 'Locating...' : 'Change'}
                   </button>
@@ -398,21 +400,21 @@ export const HomeScreen = () => {
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   {/* Desktop Location Segment */}
                   <div className="hidden sm:flex items-center gap-2 px-3 py-2 border-r border-slate-200 dark:border-slate-700 sm:max-w-xs shrink-0">
-                    <MapPin size={18} className="text-teal-600 shrink-0" />
-                    <span className="text-sm sm:text-base font-bold text-slate-700 dark:text-slate-300 truncate">
+                    <MapPin size={17} className="text-teal-600 shrink-0" />
+                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">
                       {formattedLocation || 'Near You'}
                     </span>
                   </div>
 
                   {/* Search Input */}
                   <div className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-0">
-                    <Search size={19} className="text-slate-400 shrink-0" />
+                    <Search size={18} className="text-slate-400 shrink-0" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search doctor, clinic, or specialty..."
-                      className="w-full text-sm sm:text-base bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none font-medium"
+                      className="w-full text-xs sm:text-sm bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none font-medium"
                     />
                     {searchQuery && (
                       <button
@@ -420,7 +422,7 @@ export const HomeScreen = () => {
                         onClick={() => setSearchQuery('')}
                         className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
                       >
-                        <X size={16} />
+                        <X size={15} />
                       </button>
                     )}
                   </div>
@@ -428,82 +430,117 @@ export const HomeScreen = () => {
                   {/* Search Button */}
                   <button
                     type="submit"
-                    className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-2.5 rounded-xl shadow-xs transition-all shrink-0 flex items-center justify-center gap-1.5 active:scale-95"
+                    className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-2.5 rounded-xl shadow-xs transition-all shrink-0 flex items-center justify-center gap-1.5 active:scale-95"
                   >
                     <span>Search</span>
-                    <ArrowRight size={15} className="hidden sm:inline" />
+                    <ArrowRight size={14} className="hidden sm:inline" />
                   </button>
                 </div>
               </div>
             </form>
 
             {/* Popular Searches */}
-            <div className="flex items-center gap-1.5 pt-1 text-sm text-slate-500 dark:text-slate-400 overflow-x-auto scrollbar-hide py-0.5 -mx-1 px-1">
-              <span className="font-bold text-slate-700 dark:text-slate-300 text-sm shrink-0">Popular:</span>
+            <div className="flex items-center gap-1.5 pt-0.5 text-xs text-slate-500 dark:text-slate-400 overflow-x-auto scrollbar-none py-0.5 -mx-1 px-1">
+              <span className="font-bold text-slate-700 dark:text-slate-300 shrink-0">Popular:</span>
               {['General Physician', 'Cardiologist', 'Dermatologist', 'Pediatrician', 'Dentist', 'Gynecologist'].map((tag) => (
                 <button
                   key={tag}
                   type="button"
                   onClick={() => handleCategorySearch(tag)}
-                  className="px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-slate-700 hover:text-teal-700 dark:hover:text-teal-300 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 transition-all font-semibold text-sm shrink-0 shadow-2xs active:scale-95 whitespace-nowrap"
+                  className="px-3 py-1 rounded-full bg-white/95 dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-slate-700 hover:text-teal-700 dark:hover:text-teal-300 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 transition-all font-semibold text-xs shrink-0 shadow-2xs active:scale-95 whitespace-nowrap"
                 >
                   {tag}
                 </button>
               ))}
             </div>
 
-            {/* Mobile Trust & Quick Booking Ribbon */}
-            <div className="lg:hidden flex items-center justify-between p-3 rounded-2xl bg-white/85 dark:bg-slate-850/85 border border-teal-100/90 dark:border-slate-700/80 shadow-2xs mt-2 backdrop-blur-xs">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="relative shrink-0">
-                  <div className="w-11 h-11 rounded-xl overflow-hidden border border-teal-500/30 shadow-2xs">
-                    <img
-                      src="/images/doctor_priya_clinic.jpg"
-                      alt="Verified In-Clinic Doctor"
-                      className="w-full h-full object-cover"
-                    />
+            {/* Mobile Feature Card with AI-Generated Attractive Doctor Photo */}
+            <div className="lg:hidden mt-3 relative rounded-2xl overflow-hidden border border-teal-200/80 dark:border-slate-700 bg-white/95 dark:bg-slate-850 shadow-sm backdrop-blur-sm">
+              <div className="flex items-center">
+                <div className="relative w-28 sm:w-32 h-32 shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  <img
+                    src="/images/hero_doctor_banner.jpg"
+                    alt="Verified Doctor Specialist"
+                    className="w-full h-full object-cover object-top"
+                  />
+                  <div className="absolute top-2 left-2 bg-emerald-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    <span>Active</span>
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-base font-black text-slate-900 dark:text-white leading-tight truncate">Verified In-Clinic Doctors</p>
-                    <span className="text-xs font-bold uppercase px-1.5 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 rounded shrink-0">Today</span>
+                <div className="p-3 flex-1 min-w-0 flex flex-col justify-between self-stretch">
+                  <div>
+                    <div className="flex items-center gap-1 text-amber-500 text-[11px] font-bold mb-0.5">
+                      <Star size={12} className="fill-amber-400 text-amber-400" />
+                      <span className="text-slate-800 dark:text-slate-200 font-extrabold">4.9</span>
+                      <span className="text-slate-400 font-normal">• Verified Care</span>
+                    </div>
+                    <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
+                      Consult Verified Doctors Today
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                      Top specialists in {formattedLocation || 'your area'}
+                    </p>
                   </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5 font-medium truncate">Top-rated specialists available in {locationName || 'your area'}</p>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-md border border-teal-200/60 dark:border-teal-800/60">
+                      Instant Slot
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => router.push('/search')}
+                      className="text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 px-3.5 py-1.5 rounded-lg shadow-xs transition-transform active:scale-95 flex items-center gap-1"
+                    >
+                      <span>Book Visit</span>
+                      <ArrowRight size={12} />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => router.push('/search')}
-                className="shrink-0 text-sm font-black text-teal-700 dark:text-teal-300 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/40 dark:hover:bg-teal-900/70 border border-teal-200/80 dark:border-teal-700/80 px-4 py-2 rounded-xl transition-colors active:scale-95 ml-2"
-              >
-                Book →
-              </button>
             </div>
           </div>
 
-          {/* Desktop Right Hero: Real Clinic Photo */}
+          {/* Desktop Right Hero: AI Doctor Showcase with Floating Badges */}
           <div className="hidden lg:flex lg:col-span-5 relative items-center justify-center">
-            <div className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-md border border-slate-200/80 dark:border-slate-700 group">
+            <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-xl border-2 border-white/80 dark:border-slate-700/80 group bg-slate-100 dark:bg-slate-800">
               <img
-                src="/images/doctor_priya_clinic.jpg"
-                alt="Consultant Physician Clinic Consultation"
-                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                src="/images/hero_doctor_banner.jpg"
+                alt="Top Rated Verified Medical Specialist"
+                className="w-full h-[410px] object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              <div className="absolute bottom-3 left-3 right-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-xl p-2.5 shadow-sm border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Verified In-Clinic Doctors</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Consultations available today</p>
+              {/* Soft gradient overlay at bottom */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
+
+              {/* Floating Top Badge: Rating */}
+              <div className="absolute top-4 left-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-md border border-white/50 dark:border-slate-700 flex items-center gap-1.5">
+                <Star size={14} className="fill-amber-400 text-amber-400" />
+                <span className="text-xs font-extrabold text-slate-800 dark:text-white">4.9/5</span>
+                <span className="text-[11px] text-slate-500 font-medium">(1,200+ Reviews)</span>
+              </div>
+
+              {/* Floating Top Right: Verified Badge */}
+              <div className="absolute top-4 right-4 bg-emerald-500/95 text-white backdrop-blur-md px-2.5 py-1 rounded-xl shadow-md text-[11px] font-bold flex items-center gap-1">
+                <ShieldCheck size={14} />
+                <span>100% Verified</span>
+              </div>
+
+              {/* Bottom Floating Glass Card */}
+              <div className="absolute bottom-4 left-4 right-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl p-3.5 shadow-lg border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
+                <div className="min-w-0 pr-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">In-Clinic Consultations</p>
                   </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium truncate mt-0.5">
+                    Top specialists available today
+                  </p>
                 </div>
                 <button
                   onClick={() => router.push('/search')}
-                  className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline"
+                  className="text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 px-3.5 py-2 rounded-xl shadow-xs transition-all active:scale-95 shrink-0 flex items-center gap-1"
                 >
-                  Book →
+                  <span>Book</span>
+                  <ArrowRight size={13} />
                 </button>
               </div>
             </div>
