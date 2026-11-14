@@ -448,6 +448,24 @@ export default function CheckoutClient() {
                   </p>
                 </div>
 
+                {/* Unlocked Contact Details in Success Modal */}
+                {(appointment?.chamber?.phone || appointment?.doctorPhone || appointment?.doctorId?.phone) && (
+                  <div className="mt-3 p-3.5 bg-emerald-50 dark:bg-emerald-950/60 rounded-2xl border border-emerald-300 dark:border-emerald-700 text-left w-full space-y-1.5">
+                    <p className="text-[11px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-200 flex items-center gap-1.5">
+                      <Phone size={13} className="text-emerald-600" /> Clinic / Doctor Contact Number
+                    </p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                      Unlocked for your confirmed appointment:
+                    </p>
+                    <a
+                      href={`tel:${(appointment?.chamber?.phone || appointment?.doctorPhone || appointment?.doctorId?.phone).replace(/[^\d+]/g, '')}`}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md shadow-emerald-600/20 active:scale-95"
+                    >
+                      <Phone size={12} /> Call {appointment?.chamber?.phone || appointment?.doctorPhone || appointment?.doctorId?.phone}
+                    </a>
+                  </div>
+                )}
+
                 <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-5 overflow-hidden">
                   <div className="bg-emerald-500 h-1.5 rounded-full animate-[slideRight_2.5s_linear_forwards]" style={{ width: '100%', animation: 'slideRight 2.5s linear forwards', left: '-100%', position: 'relative' }}>
                     <style>{`@keyframes slideRight { to { left: 0 } }`}</style>
@@ -577,8 +595,10 @@ export default function CheckoutClient() {
 
                 {/* Chamber / Clinic Venue Card (if available) */}
                 {isChamberBooking && (appointment.chamber || appointment.chamberName) && (() => {
-                  const chamberInfo = appointment.chamber || { name: appointment.chamberName, address: appointment.chamberAddress };
+                  const chamberInfo = appointment.chamber || { name: appointment.chamberName, address: appointment.chamberAddress, phone: appointment.chamberPhone };
                   const mapUrl = directionsUrl(chamberInfo);
+                  const isPaid = !!appointment.bookingFeePaid || paymentStatus === 'success';
+                  const contactNum = chamberInfo.phone || appointment.doctorPhone || appointment.doctorId?.phone;
                   return (
                     <div className="p-4 mb-4 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200/60 dark:border-emerald-900/40 flex items-start gap-3.5">
                       <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -588,6 +608,25 @@ export default function CheckoutClient() {
                         <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Visiting Chamber</p>
                         <p className="text-sm font-black text-slate-900 dark:text-white mt-0.5">{chamberInfo.name}</p>
                         {chamberInfo.address && <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 font-medium">{chamberInfo.address}</p>}
+
+                        {/* Doctor / Clinic Phone: ONLY shown after payment */}
+                        {isPaid && contactNum ? (
+                          <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-100/70 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-700 text-xs">
+                            <span className="font-bold text-emerald-800 dark:text-emerald-200 flex items-center gap-1.5 flex-wrap">
+                              <Phone size={13} className="text-emerald-600 dark:text-emerald-400" />
+                              <span>Clinic &amp; Doctor Contact:</span>
+                              <a href={`tel:${contactNum.replace(/[^\d+]/g, '')}`} className="font-black text-emerald-700 dark:text-emerald-300 underline">
+                                {contactNum}
+                              </a>
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                            <Lock size={11} className="text-slate-400 shrink-0" />
+                            <span>Clinic contact phone &amp; arrival instructions unlocked after payment</span>
+                          </div>
+                        )}
+
                         {mapUrl && (
                           <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline">
                             <Navigation size={12} /> View Map Directions

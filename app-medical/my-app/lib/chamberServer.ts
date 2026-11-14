@@ -58,8 +58,9 @@ export async function setChamberPresence(chamber: ChamberRow, action: unknown, g
   }
   if (action !== 'in') return { error: 'action must be "in" or "out".' };
 
-  const window = checkInWindow(chamber);
-  if (!window.allowed) return { error: window.reason || 'Check-in is not open right now.' };
+  if (chamber.isActive === false) {
+    return { error: 'This chamber is currently deactivated. Please activate it first.' };
+  }
 
   const hasGps = isValidLatLng(gps?.lat, gps?.lng);
   const data: Record<string, unknown> = {

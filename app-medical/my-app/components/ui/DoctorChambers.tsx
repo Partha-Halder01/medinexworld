@@ -179,14 +179,9 @@ export function DoctorChamberList({ chambers, initialLocation, onBook }: {
                   <Navigation size={13} className="text-teal-600" /> Directions
                 </a>
               )}
-              {chamber.phone && (
-                <a
-                  href={`tel:${chamber.phone.replace(/[^\d+]/g, '')}`}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5"
-                >
-                  <Phone size={13} className="text-teal-600" /> Call chamber
-                </a>
-              )}
+              <span className="px-3.5 py-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs font-semibold flex items-center gap-1.5">
+                <Lock size={12} className="text-slate-400" /> Clinic phone shown after payment
+              </span>
               {onBook && (
                 <button
                   type="button"
@@ -375,6 +370,8 @@ export function ChamberBookingPanel({
                     className={`w-full text-left p-3 rounded-2xl border-2 transition-all ${
                       isSel
                         ? 'border-teal-600 bg-teal-50/70 dark:bg-teal-950/40 dark:border-teal-500'
+                        : c.isDoctorIn
+                        ? 'border-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 hover:border-emerald-500 shadow-xs'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >

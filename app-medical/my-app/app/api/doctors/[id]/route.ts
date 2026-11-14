@@ -9,11 +9,14 @@ export const dynamic = 'force-dynamic';
 function docToResponse(doc: any) {
   const { password, authOtpHash, chambers, ...rest } = doc;
   const now = istNow();
+  const serializedChambers = Array.isArray(chambers) ? chambers.map((c: any) => serializeChamber(c, now)) : [];
+  const inChamber = serializedChambers.find((c: any) => c.isDoctorIn);
   return {
     ...rest,
     _id: rest.id,
     location: rest.locationLat != null ? { lat: rest.locationLat, lng: rest.locationLng } : null,
-    ...(Array.isArray(chambers) ? { chambers: chambers.map((c: any) => serializeChamber(c, now)) } : {}),
+    inChamberNow: inChamber ? { id: inChamber.id, name: inChamber.name, address: inChamber.address } : null,
+    ...(Array.isArray(chambers) ? { chambers: serializedChambers } : {}),
   };
 }
 

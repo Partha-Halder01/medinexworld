@@ -230,6 +230,15 @@ export const AppointmentsScreen = () => {
                       <div className="min-w-0">
                         <p className="text-sm font-black text-gray-900 dark:text-white">{chamber.name}</p>
                         {chamber.address && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{chamber.address}</p>}
+                        {chamber.phone && (
+                          <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold pt-1">
+                            <Phone size={12} />
+                            <span>Clinic Phone:</span>
+                            <a href={`tel:${chamber.phone.replace(/[^\d+]/g, '')}`} className="underline font-black">
+                              {chamber.phone}
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-wrap">

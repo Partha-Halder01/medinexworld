@@ -46,9 +46,9 @@ export const DoctorCard = ({ doctor, showDistance, layout = 'grid', hideVideoAnd
     || doctor.hospitalId?.name
     || normalizeClinicAddress(doctor.address || 'Medinex Care Center').split(',')[0];
   const inChamberBadge = doctor.inChamberNow ? (
-    <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md font-bold" title={`In chamber now: ${doctor.inChamberNow.name}`}>
-      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-      In chamber now
+    <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md font-bold text-xs" title={`In chamber now: ${doctor.inChamberNow.name}${doctor.inChamberNow.address ? ` (${doctor.inChamberNow.address})` : ''}`}>
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+      <span className="truncate max-w-[150px] sm:max-w-[200px]">In {doctor.inChamberNow.name} now</span>
     </span>
   ) : null;
   const hasValidPhoto = !imgErr && isDisplayableImage(doctor.image);

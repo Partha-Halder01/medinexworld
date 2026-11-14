@@ -22,7 +22,7 @@ function docToResponse(doc: any, now = istNow()) {
     chamberLocations: activeChambers
       .filter(c => isValidLatLng(c.locationLat, c.locationLng))
       .map(c => ({ id: c.id, name: c.name, lat: c.locationLat, lng: c.locationLng })),
-    inChamberNow: inChamber ? { id: inChamber.id, name: inChamber.name } : null,
+    inChamberNow: inChamber ? { id: inChamber.id, name: inChamber.name, address: inChamber.address } : null,
   };
 }
 
@@ -47,7 +47,7 @@ export async function GET(req: Request) {
         chambers: {
           where: { isActive: true },
           select: {
-            id: true, name: true, locationLat: true, locationLng: true, isActive: true,
+            id: true, name: true, address: true, locationLat: true, locationLng: true, isActive: true,
             scheduleType: true, weekDays: true, monthDays: true, startTime: true, endTime: true,
             checkedInAt: true, checkedOutAt: true,
           },

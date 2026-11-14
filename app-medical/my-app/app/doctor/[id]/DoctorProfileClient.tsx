@@ -14,7 +14,7 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { buildDoctorProfilePath, extractDoctorIdFromSlugParam } from '@/lib/doctorProfileUrl';
 import Link from 'next/link';
 import { ChamberBookingPanel, ChamberStatusBadge, DoctorChamberList, type PublicChamber } from '@/components/ui/DoctorChambers';
-import { formatDateLabel } from '@/lib/chamber';
+import { formatDateLabel, directionsUrl } from '@/lib/chamber';
 import { PhotoGallery, type GalleryPhoto } from '@/components/ui/PhotoGallery';
 import { displayableImages } from '@/lib/imageUrl';
 import { isDisplayableImage } from '@/lib/imageUrl';
@@ -1137,9 +1137,36 @@ export default function DoctorProfileClient() {
                   </div>
 
                   {chamberIn && (
-                    <div className="inline-flex items-center gap-2 flex-wrap">
-                      <ChamberStatusBadge chamber={chamberIn} size="md" />
-                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">at {chamberIn.name}</span>
+                    <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/5 border-2 border-emerald-500/40 dark:border-emerald-500/30 flex items-center justify-between gap-3 shadow-xs">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="relative flex h-3.5 w-3.5 shrink-0">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500" />
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/70 px-2.5 py-0.5 rounded-full">
+                              Doctor In Chamber Now
+                            </span>
+                            <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
+                              {chamberIn.name}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate mt-0.5">
+                            {chamberIn.address}
+                          </p>
+                        </div>
+                      </div>
+                      {directionsUrl(chamberIn) && (
+                        <a
+                          href={directionsUrl(chamberIn)!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors"
+                        >
+                          <Navigation size={12} /> Directions
+                        </a>
+                      )}
                     </div>
                   )}
 
@@ -1637,23 +1664,17 @@ export default function DoctorProfileClient() {
               <BookingPanel {...bookingProps} />
             )}
 
-            {/* Quick Doctor Help Card */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center">
-                  <Phone size={18} />
-                </div>
-                <div>
-                  <h4 className="font-black text-xs text-slate-900 dark:text-white">Need Booking Assistance?</h4>
-                  <p className="text-[11px] text-slate-500">{siteSettings?.supportPhone || 'Our care desk is available 24/7'}</p>
-                </div>
+            {/* Confirmed Booking Guarantee - Phone revealed after booking */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <ShieldCheck size={20} />
               </div>
-              <a
-                href={siteSettings?.supportPhone ? `tel:${siteSettings.supportPhone.replace(/[^\d+]/g, '')}` : 'tel:112'}
-                className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline"
-              >
-                Call Desk
-              </a>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-black text-xs text-slate-900 dark:text-white">Confirmed Booking Guarantee</h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Direct doctor &amp; clinic contact number unlocked immediately upon booking confirmation.
+                </p>
+              </div>
             </div>
           </div>
 

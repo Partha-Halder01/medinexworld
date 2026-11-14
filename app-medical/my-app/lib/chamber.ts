@@ -182,15 +182,8 @@ export function ordinal(n: number): string {
 }
 
 /** Can the doctor press "I'm In" right now? */
-export function checkInWindow(chamber: ChamberLike, now = istNow()): { allowed: boolean; reason?: string } {
+export function checkInWindow(chamber: ChamberLike, _now = istNow()): { allowed: boolean; reason?: string } {
   if (chamber.isActive === false) return { allowed: false, reason: 'This chamber is deactivated.' };
-  if (!isChamberOpenOn(chamber, now.dateISO)) return { allowed: false, reason: 'This chamber is not scheduled for today.' };
-  const start = timeToMinutes(chamber.startTime || '');
-  const end = timeToMinutes(chamber.endTime || '');
-  if (now.minutes < start - CHECK_IN_EARLY_MINUTES) {
-    return { allowed: false, reason: `Check-in opens at ${minutesTo12h(Math.max(0, start - CHECK_IN_EARLY_MINUTES))}.` };
-  }
-  if (now.minutes > end) return { allowed: false, reason: "Today's chamber session is already over." };
   return { allowed: true };
 }
 
@@ -200,8 +193,9 @@ export function isDoctorInChamber(chamber: ChamberLike, now = istNow()): boolean
   if (Number.isNaN(inAt.getTime())) return false;
   if (chamber.checkedOutAt && new Date(chamber.checkedOutAt) >= inAt) return false;
   if (istDateOf(inAt) !== now.dateISO) return false;
-  const end = timeToMinutes(chamber.endTime || '');
-  if (Number.isFinite(end) && now.minutes > end + CHECK_IN_GRACE_MINUTES) return false;
+  // If the doctor checked in today in IST, keep them marked IN for up to 14 hours or until explicit checkout
+  const elapsedMs = Date.now() - inAt.getTime();
+  if (elapsedMs > 14 * 60 * 60 * 1000) return false;
   return true;
 }
 

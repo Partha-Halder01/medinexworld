@@ -141,6 +141,7 @@ export const DoctorChambersScreen = () => {
   }, []);
 
   const now = istNow();
+  const currentInChamber = useMemo(() => chambers.find(c => c.isDoctorIn), [chambers]);
   const todays = useMemo(
     () => chambers.filter(c => c.isActive && isChamberOpenOn(c, now.dateISO)),
     [chambers, now.dateISO]
@@ -156,7 +157,7 @@ export const DoctorChambersScreen = () => {
       let coords: { lat: number; lng: number } | null = null;
       if (action === 'in') {
         try {
-          coords = await getCurrentPosition(10000);
+          coords = await getCurrentPosition(3000);
         } catch {
           coords = null; // check-in still works without GPS
         }
@@ -176,7 +177,7 @@ export const DoctorChambersScreen = () => {
         showToast(
           far
             ? `Checked in. Note: you seem to be ${formatDistance(data.distanceFromChamberKm)} from the saved chamber location.`
-            : `You're marked IN at ${chamber.name}. Patients can see it now.`,
+            : `You're marked IN at ${chamber.name}. Patients can see you live now!`,
           far ? 'error' : 'success'
         );
       } else {
@@ -250,6 +251,38 @@ export const DoctorChambersScreen = () => {
           <Plus size={18} /> Add Chamber
         </button>
       </div>
+
+      {/* Active Chamber In Banner */}
+      {currentInChamber && (
+        <div className="bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/5 rounded-2xl border-2 border-emerald-500/40 dark:border-emerald-500/30 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="relative flex h-3.5 w-3.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500" />
+            </span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/70 px-2.5 py-0.5 rounded-full">
+                  You are marked IN
+                </span>
+                <span className="text-sm sm:text-base font-black text-slate-900 dark:text-white truncate">
+                  {currentInChamber.name}
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate mt-0.5">
+                {currentInChamber.address} · Patients can see you are live at this location right now.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => handlePresence(currentInChamber, 'out')}
+            disabled={busyId === currentInChamber.id}
+            className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shrink-0 flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
+          >
+            {busyId === currentInChamber.id ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />} Check Out
+          </button>
+        </div>
+      )}
 
       {/* Today */}
       {todays.length > 0 && (
@@ -333,15 +366,14 @@ function PresenceButton({ chamber, busy, onPresence, compact }: {
   onPresence: (c: Chamber, action: 'in' | 'out') => void;
   compact?: boolean;
 }) {
-  const win = checkInWindow(chamber);
-  const size = compact ? 'px-3 py-1.5 text-xs' : 'px-4 py-2.5 text-sm';
+  const size = compact ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm';
 
   if (chamber.isDoctorIn) {
     return (
       <button
         onClick={() => onPresence(chamber, 'out')}
         disabled={busy}
-        className={`inline-flex items-center justify-center gap-1.5 rounded-xl font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 transition-colors disabled:opacity-60 ${size}`}
+        className={`inline-flex items-center justify-center gap-1.5 rounded-xl font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 transition-colors disabled:opacity-60 active:scale-95 ${size}`}
       >
         {busy ? <Loader2 size={15} className="animate-spin" /> : <LogOut size={15} />} Check Out
       </button>
@@ -350,13 +382,8 @@ function PresenceButton({ chamber, busy, onPresence, compact }: {
   return (
     <button
       onClick={() => onPresence(chamber, 'in')}
-      disabled={busy || !win.allowed}
-      title={win.allowed ? 'Mark yourself as present in this chamber' : win.reason}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-xl font-bold transition-colors disabled:cursor-not-allowed ${size} ${
-        win.allowed
-          ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 disabled:opacity-60'
-          : 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
-      }`}
+      disabled={busy || !chamber.isActive}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-xl font-bold transition-colors bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 disabled:opacity-60 active:scale-95 ${size}`}
     >
       {busy ? <Loader2 size={15} className="animate-spin" /> : <LogIn size={15} />} I&apos;m In
     </button>
@@ -471,8 +498,62 @@ function ChamberCard({ chamber, busy, onEdit, onToggle, onDelete, onPresence }: 
         )}
       </div>
 
+      {/* Real-time Presence / Check-In Box for Every Chamber */}
+      <div className={`p-3.5 rounded-2xl border transition-all ${
+        chamber.isDoctorIn
+          ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 shadow-sm'
+          : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
+      }`}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {chamber.isDoctorIn ? (
+              <span className="relative flex h-3.5 w-3.5 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500" />
+              </span>
+            ) : (
+              <span className="w-3.5 h-3.5 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" />
+            )}
+            <div className="min-w-0">
+              <p className={`text-xs font-black truncate ${
+                chamber.isDoctorIn ? 'text-emerald-800 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'
+              }`}>
+                {chamber.isDoctorIn ? 'You are currently IN this chamber' : 'Doctor Presence: Currently Out'}
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                {chamber.isDoctorIn
+                  ? 'Patients can see you are live at this location right now.'
+                  : 'Click when you arrive so patients see you in this chamber.'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onPresence(chamber, chamber.isDoctorIn ? 'out' : 'in')}
+            disabled={busy || !chamber.isActive}
+            className={`px-4 py-2 rounded-xl text-xs font-black inline-flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 shrink-0 ${
+              chamber.isDoctorIn
+                ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/20'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+            }`}
+          >
+            {busy ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : chamber.isDoctorIn ? (
+              <>
+                <LogOut size={14} /> Check Out
+              </>
+            ) : (
+              <>
+                <LogIn size={14} /> Mark In Chamber
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
       <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-gray-100 dark:border-gray-700/60">
-        {openToday && <div className="pt-2"><PresenceButton chamber={chamber} busy={busy} onPresence={onPresence} compact /></div>}
         {chamber.hospitalId ? (
           <p className="pt-2 ml-auto text-[11px] text-gray-500 dark:text-gray-400">Timetable &amp; fee are set by the hospital / nursing home.</p>
         ) : (
