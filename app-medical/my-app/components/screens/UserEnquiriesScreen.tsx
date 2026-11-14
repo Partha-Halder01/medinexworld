@@ -23,7 +23,8 @@ import {
   User,
   ArrowRight,
   Pill,
-  Truck
+  Truck,
+  Download
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/app/context/AppContext';
@@ -550,24 +551,81 @@ export const UserEnquiriesScreen = () => {
       </div>
 
       {/* Document / Image Preview Modal */}
-      {previewImage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="relative max-w-3xl w-full bg-white dark:bg-slate-900 rounded-3xl p-4 overflow-hidden border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Attached Document Preview</h4>
-              <button
-                onClick={() => setPreviewImage(null)}
-                className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="p-2 flex items-center justify-center max-h-[75vh] overflow-auto">
-              <img src={previewImage} alt="Attachment" className="max-h-[70vh] object-contain rounded-xl" />
+      {previewImage && (() => {
+        const isPdf = Boolean(
+          previewImage.startsWith('data:application/pdf') ||
+          previewImage.includes('application/pdf')
+        );
+
+        const handleDownload = () => {
+          try {
+            const arr = previewImage.split(',');
+            if (arr.length < 2) {
+              window.open(previewImage, '_blank');
+              return;
+            }
+            const mime = arr[0].match(/:(.*?);/)?.[1] || (isPdf ? 'application/pdf' : 'image/jpeg');
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+              u8arr[n] = bstr.charCodeAt(n);
+            }
+            const blob = new Blob([u8arr], { type: mime });
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `document_${Date.now()}.${isPdf ? 'pdf' : 'jpg'}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+          } catch {
+            window.open(previewImage, '_blank');
+          }
+        };
+
+        return (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-slate-950/85 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="relative max-w-4xl w-full bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[92vh]">
+              <div className="flex items-center justify-between pb-3.5 border-b border-slate-200 dark:border-slate-700 shrink-0 gap-3">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+                    {isPdf ? 'Prescription / Report (PDF)' : 'Attached Document Preview'}
+                  </h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownload}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-colors shadow-xs"
+                  >
+                    <Download size={13} />
+                    <span>Download / Open</span>
+                  </button>
+                  <button
+                    onClick={() => setPreviewImage(null)}
+                    className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="p-2 sm:p-3 flex-1 flex flex-col items-center justify-center overflow-auto min-h-[350px]">
+                {isPdf ? (
+                  <div className="w-full h-[68vh] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950">
+                    <iframe src={previewImage} className="w-full h-full border-0" title="PDF Document" />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center max-h-[72vh] overflow-auto">
+                    <img src={previewImage} alt="Attachment" className="max-h-[70vh] object-contain rounded-2xl shadow-sm" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Enquiry Modals */}
       <TestReportEnquiryModal

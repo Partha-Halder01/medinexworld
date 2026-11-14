@@ -34,7 +34,8 @@ import {
   Truck,
   ClipboardList,
   Pill,
-  PackageCheck
+  PackageCheck,
+  Download
 } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
 
@@ -86,7 +87,7 @@ export const AdminEnquiriesScreen = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Document preview modal
-  const [previewDoc, setPreviewDoc] = useState<{ url: string; title: string } | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<{ url: string; title: string; fileType?: string } | null>(null);
 
   useEffect(() => {
     fetchEnquiries();
@@ -1159,25 +1160,109 @@ export const AdminEnquiriesScreen = () => {
         </div>
       )}
 
-      {/* ── Document / Prescription Modal ────────────────────── */}
-      {previewDoc && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xs">
-          <div className="relative max-w-3xl w-full bg-white dark:bg-slate-900 rounded-3xl p-4 overflow-hidden border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">{previewDoc.title}</h4>
-              <button
-                onClick={() => setPreviewDoc(null)}
-                className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="p-2 flex items-center justify-center max-h-[75vh] overflow-auto">
-              <img src={previewDoc.url} alt="Prescription Document" className="max-h-[70vh] object-contain rounded-xl" />
+      {/* ── Document / Prescription Modal (PDF & Image Viewer) ────────────────────── */}
+      {previewDoc && (() => {
+        const isPdf = Boolean(
+          previewDoc.url?.startsWith('data:application/pdf') ||
+          previewDoc.fileType?.includes('pdf') ||
+          previewDoc.title?.toLowerCase().endsWith('.pdf')
+        );
+
+        const handleDownloadOrOpen = () => {
+          try {
+            const arr = previewDoc.url.split(',');
+            if (arr.length < 2) {
+              window.open(previewDoc.url, '_blank');
+              return;
+            }
+            const mime = arr[0].match(/:(.*?);/)?.[1] || (isPdf ? 'application/pdf' : 'image/jpeg');
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+              u8arr[n] = bstr.charCodeAt(n);
+            }
+            const blob = new Blob([u8arr], { type: mime });
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            const safeTitle = previewDoc.title.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+            a.download = safeTitle.endsWith('.pdf') ? safeTitle : `${safeTitle}.${isPdf ? 'pdf' : 'jpg'}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+          } catch {
+            window.open(previewDoc.url, '_blank');
+          }
+        };
+
+        return (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-slate-950/85 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="relative max-w-4xl w-full bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[92vh]">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3.5 border-b border-slate-200 dark:border-slate-700 shrink-0 gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    isPdf ? 'bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400' : 'bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400'
+                  }`}>
+                    {isPdf ? <FileText size={18} /> : <Eye size={18} />}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                      {previewDoc.title}
+                    </h4>
+                    <span className={`inline-block text-[10px] font-bold px-2 py-0.2 rounded-md uppercase tracking-wider ${
+                      isPdf ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800' : 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800'
+                    }`}>
+                      {isPdf ? '📄 PDF Document' : '🖼️ Image Document'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleDownloadOrOpen}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-colors shadow-xs"
+                    title="Download document or open in full size"
+                  >
+                    <Download size={13} />
+                    <span>Download / Open</span>
+                  </button>
+                  <button
+                    onClick={() => setPreviewDoc(null)}
+                    className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Viewer Body */}
+              <div className="p-2 sm:p-3 flex-1 flex flex-col items-center justify-center overflow-auto min-h-[350px]">
+                {isPdf ? (
+                  <div className="w-full h-[68vh] flex flex-col rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950">
+                    <iframe
+                      src={previewDoc.url}
+                      className="w-full h-full rounded-2xl border-0"
+                      title={previewDoc.title}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center max-h-[72vh] overflow-auto">
+                    <img 
+                      src={previewDoc.url} 
+                      alt="Prescription Document" 
+                      className="max-h-[70vh] object-contain rounded-2xl shadow-sm" 
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };
