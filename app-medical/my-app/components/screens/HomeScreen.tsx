@@ -349,7 +349,7 @@ export const HomeScreen = () => {
         </div>
       </div>
 
-      {/* ── 🌟 REDESIGNED PREMIUM HEALTHCARE HERO CARD ── */}
+      {/* ── 🌟 REDESIGNED PREMIUM HEALTHCARE HERO CARD (BIG DOCTOR PHOTO) ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-teal-500/[0.08] via-cyan-500/[0.04] to-emerald-500/[0.08] dark:from-slate-900 dark:via-slate-850 dark:to-teal-950/40 rounded-3xl border border-teal-200/70 dark:border-slate-700/80 p-4 sm:p-6 md:p-8 lg:p-9 shadow-sm">
         {/* Soft Ambient Background Glows */}
         <div className="absolute -top-20 -right-20 w-80 h-80 bg-teal-400/15 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -454,62 +454,54 @@ export const HomeScreen = () => {
               ))}
             </div>
 
-            {/* Mobile Feature Card with AI-Generated Attractive Doctor Photo */}
-            <div className="lg:hidden mt-3 relative rounded-2xl overflow-hidden border border-teal-200/80 dark:border-slate-700 bg-white/95 dark:bg-slate-850 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center">
-                <div className="relative w-28 sm:w-32 h-32 shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
-                  <img
-                    src="/images/hero_doctor_banner.jpg"
-                    alt="Verified Doctor Specialist"
-                    className="w-full h-full object-cover object-top"
-                  />
-                  <div className="absolute top-2 left-2 bg-emerald-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                    <span>Active</span>
-                  </div>
+            {/* 📸 MOBILE BIG DOCTOR HERO BANNER (Full-width, prominent, attractive AI Doctor photo) 📸 */}
+            <div className="lg:hidden relative rounded-2xl overflow-hidden shadow-lg border-2 border-white dark:border-slate-700 bg-slate-900 group mt-3">
+              <img
+                src="/images/hero_doctor_banner.jpg"
+                alt="Verified Top Doctor Specialist"
+                className="w-full h-56 sm:h-64 object-cover object-top group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent flex flex-col justify-between p-4 pointer-events-none" />
+
+              {/* Floating Top Badges */}
+              <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between">
+                <span className="bg-emerald-500/95 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 backdrop-blur-xs">
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <span>Doctors Available Now</span>
+                </span>
+                <span className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-800 dark:text-white text-xs font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
+                  <Star size={13} className="fill-amber-400 text-amber-400" /> 4.9 Rating
+                </span>
+              </div>
+
+              {/* Bottom Info & CTA */}
+              <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between">
+                <div className="min-w-0 pr-2">
+                  <p className="text-white font-black text-base sm:text-lg drop-shadow-md">Consult Top Specialists</p>
+                  <p className="text-teal-300 text-xs sm:text-sm font-semibold drop-shadow-sm truncate">Verified clinics in {formattedLocation || 'your area'}</p>
                 </div>
-                <div className="p-3 flex-1 min-w-0 flex flex-col justify-between self-stretch">
-                  <div>
-                    <div className="flex items-center gap-1 text-amber-500 text-[11px] font-bold mb-0.5">
-                      <Star size={12} className="fill-amber-400 text-amber-400" />
-                      <span className="text-slate-800 dark:text-slate-200 font-extrabold">4.9</span>
-                      <span className="text-slate-400 font-normal">• Verified Care</span>
-                    </div>
-                    <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
-                      Consult Verified Doctors Today
-                    </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
-                      Top specialists in {formattedLocation || 'your area'}
-                    </p>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-md border border-teal-200/60 dark:border-teal-800/60">
-                      Instant Slot
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => router.push('/search')}
-                      className="text-xs font-bold text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 px-3.5 py-1.5 rounded-lg shadow-xs transition-transform active:scale-95 flex items-center gap-1"
-                    >
-                      <span>Book Visit</span>
-                      <ArrowRight size={12} />
-                    </button>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => router.push('/search')}
+                  className="bg-white hover:bg-teal-50 text-teal-700 text-xs sm:text-sm font-black px-4 py-2.5 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center gap-1.5 shrink-0"
+                >
+                  <span>Book Visit</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
             </div>
           </div>
 
           {/* Desktop Right Hero: AI Doctor Showcase with Floating Badges */}
           <div className="hidden lg:flex lg:col-span-5 relative items-center justify-center">
-            <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-xl border-2 border-white/80 dark:border-slate-700/80 group bg-slate-100 dark:bg-slate-800">
+            <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-2 border-white/80 dark:border-slate-700/80 group bg-slate-100 dark:bg-slate-800">
               <img
                 src="/images/hero_doctor_banner.jpg"
                 alt="Top Rated Verified Medical Specialist"
-                className="w-full h-[410px] object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
+                className="w-full h-[430px] object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
               />
               {/* Soft gradient overlay at bottom */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
 
               {/* Floating Top Badge: Rating */}
               <div className="absolute top-4 left-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-md border border-white/50 dark:border-slate-700 flex items-center gap-1.5">
@@ -548,31 +540,33 @@ export const HomeScreen = () => {
         </div>
       </section>
 
-      {/* ── 🚀 CORE SERVICES (Polished 4 Healthcare Action Cards) ── */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+      {/* ── 🚀 CORE SERVICES (4 Healthcare Action Cards with Service Photos) ── */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
             title: 'Book Doctor Visit',
             desc: 'Find clinics within 5km',
-            icon: <Stethoscope size={20} className="text-white sm:w-[22px] sm:h-[22px]" />,
-            iconBg: 'bg-gradient-to-br from-teal-500 to-emerald-600 shadow-teal-500/25',
+            image: '/images/doctor_consult_care.jpg',
+            icon: <Stethoscope size={16} className="text-white" />,
+            iconBg: 'bg-teal-600',
             badge: 'Instant Slot',
-            hasPulse: false,
-            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60',
-            cardBg: 'bg-gradient-to-br from-teal-500/6 via-emerald-500/3 to-white dark:from-teal-950/20 dark:via-slate-850 dark:to-slate-900 border-teal-200/70 dark:border-teal-900/50 hover:border-teal-400',
+            hasPulse: true,
+            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60',
+            cardBorder: 'border-teal-200/80 dark:border-teal-900/50 hover:border-teal-500',
             path: '/search',
             isComingSoon: false,
             toastMsg: '',
           },
           {
             title: 'AI Chatbot',
-            desc: 'Coming Soon',
-            icon: <Bot size={20} className="text-white sm:w-[22px] sm:h-[22px]" />,
-            iconBg: 'bg-gradient-to-br from-cyan-500 to-teal-600 shadow-cyan-500/25',
+            desc: 'Instant Symptom Analysis',
+            image: '/images/ai_symptom_checker.jpg',
+            icon: <Bot size={16} className="text-white" />,
+            iconBg: 'bg-cyan-600',
             badge: 'Coming Soon',
             hasPulse: false,
-            badgeClass: 'bg-amber-50 text-amber-700 border-amber-200/90 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/80 font-bold',
-            cardBg: 'bg-gradient-to-br from-cyan-500/5 via-amber-500/5 to-white dark:from-slate-800/60 dark:via-slate-850 dark:to-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-700',
+            badgeClass: 'bg-amber-50 text-amber-700 border-amber-200/90 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/80',
+            cardBorder: 'border-slate-200/80 dark:border-slate-800 hover:border-amber-400',
             path: '#',
             isComingSoon: true,
             toastMsg: 'AI Chatbot is coming soon! Stay tuned.',
@@ -580,25 +574,27 @@ export const HomeScreen = () => {
           {
             title: 'Hospitals / Nursing Homes',
             desc: 'Multi-specialty care',
-            icon: <Building2 size={20} className="text-white sm:w-[22px] sm:h-[22px]" />,
-            iconBg: 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/25',
+            image: '/images/modern_hospital_care.jpg',
+            icon: <Building2 size={16} className="text-white" />,
+            iconBg: 'bg-indigo-600',
             badge: 'Verified',
             hasPulse: false,
-            badgeClass: 'bg-purple-50 text-purple-700 border-purple-200/80 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/60',
-            cardBg: 'bg-gradient-to-br from-indigo-500/6 via-purple-500/3 to-white dark:from-indigo-950/20 dark:via-slate-850 dark:to-slate-900 border-indigo-200/70 dark:border-indigo-900/50 hover:border-indigo-400',
+            badgeClass: 'bg-purple-50 text-purple-700 border-purple-200/80 dark:bg-purple-950/70 dark:text-purple-300 dark:border-purple-800/60',
+            cardBorder: 'border-indigo-200/80 dark:border-indigo-900/50 hover:border-indigo-500',
             path: '/hospital',
             isComingSoon: false,
             toastMsg: '',
           },
           {
             title: 'Video Consultation',
-            desc: 'Coming Soon',
-            icon: <Video size={20} className="text-white sm:w-[22px] sm:h-[22px]" />,
-            iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/25',
+            desc: 'Tele-consult from home',
+            image: '/images/telemedicine_call.jpg',
+            icon: <Video size={16} className="text-white" />,
+            iconBg: 'bg-blue-600',
             badge: 'Coming Soon',
             hasPulse: false,
-            badgeClass: 'bg-amber-50 text-amber-700 border-amber-200/90 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/80 font-bold',
-            cardBg: 'bg-gradient-to-br from-blue-500/5 via-amber-500/5 to-white dark:from-slate-800/60 dark:via-slate-850 dark:to-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-700',
+            badgeClass: 'bg-amber-50 text-amber-700 border-amber-200/90 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/80',
+            cardBorder: 'border-slate-200/80 dark:border-slate-800 hover:border-amber-400',
             path: '#',
             isComingSoon: true,
             toastMsg: 'Video Consultation is coming soon! Stay tuned.',
@@ -614,91 +610,151 @@ export const HomeScreen = () => {
               }
               router.push(item.path);
             }}
-            className={`group rounded-2xl sm:rounded-3xl p-3 sm:p-4 border shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between active:scale-[0.98] min-w-0 ${item.cardBg}`}
+            className={`group rounded-2xl sm:rounded-3xl overflow-hidden border bg-white dark:bg-slate-850 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all text-left flex flex-col justify-between active:scale-[0.98] min-w-0 ${item.cardBorder}`}
           >
-            <div className="flex items-center justify-between gap-1 w-full mb-2 sm:mb-3">
-              <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl ${item.iconBg} flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0`}>
-                {item.icon}
+            {/* Service Image Header with Badge Overlay */}
+            <div className="relative w-full h-24 min-[400px]:h-28 sm:h-32 overflow-hidden bg-slate-100 dark:bg-slate-800">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent pointer-events-none" />
+              
+              {/* Top Row: Icon Pill & Status Badge */}
+              <div className="absolute top-2 left-2 right-2 flex items-center justify-between gap-1">
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl ${item.iconBg} flex items-center justify-center shadow-xs text-white`}>
+                  {item.icon}
+                </div>
+                <span className={`inline-flex items-center gap-1 text-[9px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full border shadow-2xs backdrop-blur-xs ${item.badgeClass}`}>
+                  {item.hasPulse && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                  {item.isComingSoon && <Clock3 size={10} className="text-amber-600 dark:text-amber-400 shrink-0" />}
+                  <span>{item.badge}</span>
+                </span>
               </div>
-              <span className={`inline-flex items-center gap-1 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full border shadow-2xs whitespace-nowrap ${item.badgeClass}`}>
-                {item.hasPulse && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                {item.isComingSoon && <Clock3 size={11} className="text-amber-600 dark:text-amber-400 shrink-0" />}
-                <span>{item.badge}</span>
-              </span>
             </div>
-            <div className="min-w-0 w-full">
-              <p className="font-extrabold text-sm min-[380px]:text-[15px] sm:text-lg text-slate-900 dark:text-white leading-snug group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-2">
-                {item.title}
-              </p>
-              <p className={`text-xs sm:text-sm mt-0.5 sm:mt-1 font-medium line-clamp-1 ${item.isComingSoon ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
-                {item.desc}
-              </p>
+
+            {/* Service Info Content */}
+            <div className="p-3 sm:p-3.5 min-w-0 w-full flex-1 flex flex-col justify-between">
+              <div>
+                <p className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white leading-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1">
+                  {item.title}
+                </p>
+                <p className={`text-[11px] sm:text-xs mt-1 font-medium line-clamp-1 ${item.isComingSoon ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
+                  {item.desc}
+                </p>
+              </div>
+              <div className="mt-2.5 flex items-center justify-between text-xs font-bold text-teal-600 dark:text-teal-400 group-hover:translate-x-0.5 transition-transform">
+                <span className="text-[11px]">Explore</span>
+                <ArrowRight size={13} />
+              </div>
             </div>
           </button>
         ))}
       </section>
 
-      {/* ── 🚑 🧪 TWO CORE ENQUIRY SERVICES (Ambulance + Test Reports) ── */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      {/* ── 🚑 🧪 TWO CORE ENQUIRY SERVICES (Ambulance + Test Reports with Service Photos) ── */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5">
         {/* Ambulance Enquiry Card */}
         <div 
           onClick={() => setShowAmbulanceModal(true)}
-          className="group relative overflow-hidden bg-gradient-to-br from-red-500/10 via-rose-500/5 to-transparent dark:from-red-950/30 dark:via-slate-800 dark:to-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-red-200/80 dark:border-red-900/50 shadow-xs hover:shadow-md hover:border-red-500/50 transition-all cursor-pointer flex flex-col justify-between"
+          className="group relative overflow-hidden bg-white dark:bg-slate-850 rounded-2xl sm:rounded-3xl border border-red-200/90 dark:border-red-900/60 shadow-xs hover:shadow-xl hover:border-red-500/60 transition-all cursor-pointer flex flex-col justify-between"
         >
-          <div className="flex items-start justify-between gap-2 mb-2.5 sm:mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-red-600 text-white flex items-center justify-center shadow-md shadow-red-600/30 group-hover:scale-105 transition-transform shrink-0">
-              <Siren size={22} className="sm:w-[26px] sm:h-[26px] animate-pulse" />
+          {/* Header Image with Gradient Overlay */}
+          <div className="relative w-full h-36 sm:h-44 overflow-hidden bg-slate-900">
+            <img
+              src="/images/ambulance_service.jpg"
+              alt="Emergency Ambulance Booking & Dispatch"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+            
+            {/* Floating Top Badge */}
+            <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+              <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-lg shadow-red-600/40">
+                <Siren size={20} className="animate-pulse" />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-wider bg-red-600 text-white px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                <span>24/7 Rapid Response</span>
+              </span>
             </div>
-            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-950/70 dark:text-red-300 px-3 py-1 rounded-full border border-red-200 dark:border-red-800 whitespace-nowrap">
-              🚨 24/7 Rapid Response
-            </span>
+
+            {/* Image Overlay Title */}
+            <div className="absolute bottom-3 left-3.5 right-3.5">
+              <h3 className="font-black text-lg sm:text-xl text-white leading-tight drop-shadow-sm">
+                Ambulance Booking & Enquiry
+              </h3>
+              <p className="text-red-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
+                Emergency dispatch & planned ICU transfers with oxygen support
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-extrabold text-lg sm:text-xl md:text-2xl text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
-              Ambulance Booking & Enquiry
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-300 mt-1 sm:mt-2 line-clamp-2 leading-relaxed">
-              Instant emergency dispatch & planned transfers with GPS tracking, oxygen & ICU life support.
+
+          {/* Card Body */}
+          <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Equipped BLS & ALS ambulances with GPS tracking, emergency life support, and prompt doorstep arrival.
             </p>
-          </div>
-          <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-red-100 dark:border-red-900/30 flex flex-col min-[420px]:flex-row min-[420px]:items-center justify-between gap-2">
-            <span className="text-sm sm:text-base font-bold text-red-600 dark:text-red-400 flex items-center gap-1">
-              Request Ambulance Now <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
-            </span>
-            <span className="text-xs sm:text-sm font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-md self-start min-[420px]:self-auto">
-              Fast Dispatch
-            </span>
+            <div className="mt-3 pt-3 border-t border-red-100 dark:border-red-900/30 flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-extrabold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Request Ambulance Now <ArrowRight size={14} />
+              </span>
+              <span className="text-[11px] font-extrabold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-200/60 dark:border-red-800/60">
+                ⚡ Fast Dispatch
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Test Report Enquiry Card */}
         <div 
           onClick={() => setShowTestModal(true)}
-          className="group relative overflow-hidden bg-gradient-to-br from-teal-500/10 via-cyan-500/5 to-transparent dark:from-teal-950/30 dark:via-slate-800 dark:to-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-teal-200/80 dark:border-teal-900/50 shadow-xs hover:shadow-md hover:border-teal-500/50 transition-all cursor-pointer flex flex-col justify-between"
+          className="group relative overflow-hidden bg-white dark:bg-slate-850 rounded-2xl sm:rounded-3xl border border-teal-200/90 dark:border-teal-900/60 shadow-xs hover:shadow-xl hover:border-teal-500/60 transition-all cursor-pointer flex flex-col justify-between"
         >
-          <div className="flex items-start justify-between gap-2 mb-2.5 sm:mb-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/30 group-hover:scale-105 transition-transform shrink-0">
-              <FlaskConical size={22} className="sm:w-[26px] sm:h-[26px]" />
+          {/* Header Image with Gradient Overlay */}
+          <div className="relative w-full h-36 sm:h-44 overflow-hidden bg-slate-900">
+            <img
+              src="/images/lab_test_service.jpg"
+              alt="Pathology Diagnostic Lab Test Enquiry"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+            
+            {/* Floating Top Badge */}
+            <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+              <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-lg shadow-teal-600/40">
+                <FlaskConical size={20} />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-wider bg-teal-600 text-white px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+                <span>🧪 Diagnostic Review</span>
+              </span>
             </div>
-            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider bg-teal-100 text-teal-800 dark:bg-teal-900/70 dark:text-teal-300 px-3 py-1 rounded-full border border-teal-200 dark:border-teal-800 whitespace-nowrap">
-              🧪 Diagnostic Review
-            </span>
+
+            {/* Image Overlay Title */}
+            <div className="absolute bottom-3 left-3.5 right-3.5">
+              <h3 className="font-black text-lg sm:text-xl text-white leading-tight drop-shadow-sm">
+                Test & Lab Report Enquiry
+              </h3>
+              <p className="text-teal-200 text-xs sm:text-sm font-medium mt-0.5 line-clamp-1">
+                Pathology discounts, prescription review & home sample collection
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-extrabold text-lg sm:text-xl md:text-2xl text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
-              Test & Lab Report Enquiry
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-300 mt-1 sm:mt-2 line-clamp-2 leading-relaxed">
-              Upload doctor prescription or test report to get pathology discount quotes and home sample pickup.
+
+          {/* Card Body */}
+          <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Upload your doctor's prescription or lab report to compare pathology costs, get discounts, and schedule doorstep sample pickup.
             </p>
-          </div>
-          <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-teal-100 dark:border-teal-900/30 flex flex-col min-[420px]:flex-row min-[420px]:items-center justify-between gap-2">
-            <span className="text-sm sm:text-base font-bold text-teal-600 dark:text-teal-400 flex items-center gap-1">
-              Enquire Test / Upload Report <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
-            </span>
-            <span className="text-xs sm:text-sm font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-md self-start min-[420px]:self-auto">
-              Home Sample Available
-            </span>
+            <div className="mt-3 pt-3 border-t border-teal-100 dark:border-teal-900/30 flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-extrabold text-teal-600 dark:text-teal-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Enquire Test / Upload Report <ArrowRight size={14} />
+              </span>
+              <span className="text-[11px] font-extrabold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-lg border border-teal-200/60 dark:border-teal-800/60">
+                🏠 Home Collection
+              </span>
+            </div>
           </div>
         </div>
       </section>
