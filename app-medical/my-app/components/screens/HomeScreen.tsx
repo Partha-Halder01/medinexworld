@@ -290,12 +290,9 @@ export const HomeScreen = () => {
 
       {/* ── Top Bar (Mobile) ── */}
       <div className="flex justify-between items-center md:hidden pb-1">
-        <div className="flex flex-col">
-          <BrandLogo width={115} height={38} imageClassName="h-[38px] w-auto max-w-[130px] object-contain" showName={false} priority />
-          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium tracking-tight mt-0.5">
-            {greeting}, <span className="font-bold text-slate-800 dark:text-white">{displayName}</span>
-          </p>
-        </div>
+        <Link href="/" className="flex items-center">
+          <BrandLogo width={155} height={52} imageClassName="h-[50px] sm:h-[56px] w-auto max-w-[170px] object-contain" showName={false} priority />
+        </Link>
         <div className="flex items-center gap-2">
           {formattedLocation && (
             <button
