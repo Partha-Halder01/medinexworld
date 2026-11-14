@@ -329,7 +329,7 @@ model PlatformSettings {
   defaultPlatformFeePercent Float    @default(10)
   chamberBookingFee         Float    @default(50)
   supportEmail              String   @default("support@medinexworld.com")
-  supportPhone              String   @default("+91 98765 43210")
+  supportPhone              String   @default("+91 81455 22359")
   emergencyPhone            String   @default("112")
   contactAddress            String?  @db.Text
   createdAt                 DateTime @default(now())

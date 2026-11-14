@@ -293,7 +293,7 @@ export const DoctorApplyScreen = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm sm:text-base text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 transition-all shadow-xs"
-                    placeholder="+91 98765 43210"
+                    placeholder="+91 81455 22359"
                   />
                 </div>
               </div>

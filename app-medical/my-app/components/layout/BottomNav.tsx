@@ -42,7 +42,8 @@ export const BottomNav = () => {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-300/70 to-transparent dark:via-blue-500/50" />
           <div className="flex items-center justify-between px-1 py-1 sm:px-2">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+                || (item.href === '/search' && (pathname.startsWith('/clinics') || pathname.startsWith('/hospital/')));
               const Icon = item.icon;
 
               return (

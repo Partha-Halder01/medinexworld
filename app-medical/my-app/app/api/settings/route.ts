@@ -12,7 +12,7 @@ export async function GET() {
 
     return NextResponse.json({
       supportEmail: settings.supportEmail || 'support@medinexworld.com',
-      supportPhone: settings.supportPhone || '+91 98765 43210',
+      supportPhone: settings.supportPhone || '+91 81455 22359',
       emergencyPhone: settings.emergencyPhone || '112',
       contactAddress: settings.contactAddress || '',
       gstPercent: settings.gstPercent,
@@ -23,7 +23,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({
       supportEmail: 'support@medinexworld.com',
-      supportPhone: '+91 98765 43210',
+      supportPhone: '+91 81455 22359',
       emergencyPhone: '112',
       contactAddress: '',
     });

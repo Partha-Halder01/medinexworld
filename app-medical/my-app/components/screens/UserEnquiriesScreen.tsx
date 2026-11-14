@@ -272,7 +272,7 @@ export const UserEnquiriesScreen = () => {
                 <Phone size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Enter phone number (e.g. 9876543210)"
+                  placeholder="Enter phone number (e.g. 8145522359)"
                   value={trackingPhone}
                   onChange={(e) => setTrackingPhone(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-slate-900 dark:text-white text-sm sm:text-base font-medium focus:ring-2 focus:ring-teal-500 focus:outline-hidden"

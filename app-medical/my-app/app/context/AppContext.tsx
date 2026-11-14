@@ -73,7 +73,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [searchFilter, setSearchFilter] = useState('All');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     supportEmail: 'support@medinexworld.com',
-    supportPhone: '+91 98765 43210',
+    supportPhone: '+91 81455 22359',
     emergencyPhone: '112',
     contactAddress: '',
   });
@@ -360,7 +360,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const data = await res.json();
         setSiteSettings({
           supportEmail: data.supportEmail || 'support@medinexworld.com',
-          supportPhone: data.supportPhone || '+91 98765 43210',
+          supportPhone: data.supportPhone || '+91 81455 22359',
           emergencyPhone: data.emergencyPhone || '112',
           contactAddress: data.contactAddress || '',
           gstPercent: data.gstPercent,

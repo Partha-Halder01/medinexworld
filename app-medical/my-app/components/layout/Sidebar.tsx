@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { Home, Search, Calendar as CalendarIcon, User, Stethoscope, FileText, Sparkles, LogIn } from 'lucide-react';
+import { Home, Search, Building2, Calendar as CalendarIcon, User, Stethoscope, FileText, Sparkles, LogIn } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
 import { useLanguage } from '@/app/context/LanguageContext';
 import Link from 'next/link';
@@ -83,6 +83,7 @@ export const Sidebar = () => {
         </div>
         <NavItem href="/" icon={<Home />} label={t('nav.home') || 'Home'} />
         <NavItem href="/search" icon={<Search />} label={t('nav.findDoctors') || 'Find Doctors'} />
+        <NavItem href="/clinics" icon={<Building2 />} label="Clinics & Hospitals" />
         <NavItem href="/appointments" icon={<CalendarIcon />} label={t('nav.appointments') || 'Appointments'} />
         <NavItem href="/blog" icon={<FileText />} label={t('nav.blog') || 'Health Articles'} />
       </nav>

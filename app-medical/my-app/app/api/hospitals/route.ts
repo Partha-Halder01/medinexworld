@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { istNow, isDoctorInChamber } from '@/lib/chamber';
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -45,7 +46,47 @@ export async function GET(req: Request) {
     });
     hospitals.sort((a: any, b: any) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
 
-    let mapped = hospitals.map(hospitalToResponse);
+    let mapped: any[] = hospitals.map(hospitalToResponse);
+
+    // Facility kind filter (clinic / hospital / nursing_home)
+    const kind = searchParams.get('kind');
+    if (kind && kind !== 'all') mapped = mapped.filter((h: any) => (h.facilityKind || 'hospital') === kind);
+
+    // Public listing: attach the bookable doctors sitting at each facility
+    if (searchParams.get('withDoctors') === '1' && mapped.length > 0) {
+      const now = istNow();
+      const chambers = await prisma.doctorChamber.findMany({
+        where: { hospitalId: { in: mapped.map((h: any) => h.id) }, isActive: true, doctor: { isVerified: true } },
+        include: { doctor: { select: { id: true, name: true, image: true, specialty: true } } },
+        orderBy: { createdAt: 'asc' },
+      });
+      const byHospital = new Map<number, typeof chambers>();
+      for (const c of chambers) {
+        if (c.hospitalId == null) continue;
+        const list = byHospital.get(c.hospitalId) ?? [];
+        list.push(c);
+        byHospital.set(c.hospitalId, list);
+      }
+      mapped = mapped.map((h: any) => {
+        const list = byHospital.get(h.id) ?? [];
+        const doctorIds = new Set(list.map(c => c.doctorId));
+        const fees = list.map(c => Number(c.fee) || 0).filter(f => f > 0);
+        const sorted = [...list].sort((a, b) => Number(isDoctorInChamber(b, now)) - Number(isDoctorInChamber(a, now)));
+        const seen = new Set<number>();
+        const preview = sorted.filter(c => !seen.has(c.doctorId) && seen.add(c.doctorId)).slice(0, 4).map(c => ({
+          _id: c.doctor.id, name: c.doctor.name, image: c.doctor.image, specialty: c.doctor.specialty,
+        }));
+        const { owner: _owner, ownerId: _ownerId, walletBalance: _w, totalPaidOut: _t, paymentLogs: _p, ...publicFields } = h;
+        return {
+          ...publicFields,
+          doctorCount: doctorIds.size,
+          inNowCount: new Set(list.filter(c => isDoctorInChamber(c, now)).map(c => c.doctorId)).size,
+          specialties: [...new Set(list.map(c => c.doctor.specialty).filter(Boolean))],
+          minFee: fees.length ? Math.min(...fees) : 0,
+          doctorPreview: preview,
+        };
+      });
+    }
 
     // Filter by tab
     if (tab === 'lab') mapped = mapped.filter((h: any) => Array.isArray(h.labServices) && h.labServices.length > 0);

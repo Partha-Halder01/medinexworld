@@ -466,7 +466,7 @@ export const HospitalAdminLoginScreen = () => {
                   <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Phone Number</label>
                   <input
                     type="tel"
-                    placeholder="+91 98765 43210"
+                    placeholder="+91 81455 22359"
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     className="w-full px-3.5 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/80 text-gray-900 dark:text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all shadow-xs"

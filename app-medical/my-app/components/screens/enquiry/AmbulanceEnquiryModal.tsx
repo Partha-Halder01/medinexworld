@@ -248,19 +248,37 @@ export const AmbulanceEnquiryModal: React.FC<AmbulanceEnquiryModalProps> = ({
                 </p>
               </div>
 
-              <div className="p-3.5 bg-red-50/70 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900/50 text-left">
-                <p className="text-xs font-bold text-red-900 dark:text-red-200 flex items-center gap-1.5">
-                  <Sparkles size={14} className="text-red-600 dark:text-red-400" /> Track Live Follow-up & Driver ETA
-                </p>
-                <p className="text-[11px] text-red-700 dark:text-red-400 mt-0.5">
-                  Dispatch status, driver assignment, and ambulance tracking updates will show in real-time.
-                </p>
+              <div className="p-3.5 bg-red-50/70 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900/50 text-left space-y-2">
+                <div>
+                  <p className="text-xs font-bold text-red-900 dark:text-red-200 flex items-center gap-1.5">
+                    <Sparkles size={14} className="text-red-600 dark:text-red-400" /> Immediate Emergency Assistance
+                  </p>
+                  <p className="text-[11px] text-red-700 dark:text-red-400 mt-0.5">
+                    Need urgent dispatch or want to speak to the control room directly?
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <a
+                    href="tel:8145522359"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 text-white text-xs font-bold shadow-xs hover:bg-red-700"
+                  >
+                    <Phone size={12} /> Call 8145522359
+                  </a>
+                  <a
+                    href="https://wa.me/918145522359?text=URGENT%3A%20Ambulance%20Dispatch%20for%20pickup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xs hover:bg-emerald-700"
+                  >
+                    WhatsApp Support
+                  </a>
+                </div>
                 <button
                   onClick={() => {
                     handleReset();
                     router.push(`/profile/enquiries?phone=${encodeURIComponent(patientPhone.trim())}`);
                   }}
-                  className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-red-700 dark:text-red-300 hover:underline"
+                  className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-red-700 dark:text-red-300 hover:underline"
                 >
                   Track Follow-up Live <ArrowRight size={13} />
                 </button>
@@ -334,7 +352,7 @@ export const AmbulanceEnquiryModal: React.FC<AmbulanceEnquiryModalProps> = ({
                       required
                       value={patientPhone}
                       onChange={(e) => setPatientPhone(e.target.value)}
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 81455 22359"
                       className="w-full pl-10 pr-3.5 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-red-500 focus:outline-hidden"
                     />
                   </div>
@@ -490,11 +508,11 @@ export const AmbulanceEnquiryModal: React.FC<AmbulanceEnquiryModalProps> = ({
               </div>
 
               {/* Submit button */}
-              <div className="pt-2 pb-2">
+              <div className="pt-2 pb-2 space-y-2.5">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 rounded-xl bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-xl bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -508,6 +526,28 @@ export const AmbulanceEnquiryModal: React.FC<AmbulanceEnquiryModalProps> = ({
                     </>
                   )}
                 </button>
+
+                {/* Direct Emergency Call / WhatsApp */}
+                <div className="pt-1 flex items-center justify-center gap-3 text-xs font-bold">
+                  <a
+                    href="tel:8145522359"
+                    className="inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 hover:underline bg-red-50 dark:bg-red-950/40 px-3 py-1.5 rounded-full border border-red-200 dark:border-red-900/50"
+                  >
+                    <Phone size={12} />
+                    <span>Call +91 81455 22359</span>
+                  </a>
+                  <a
+                    href="https://wa.me/918145522359?text=URGENT%3A%20Ambulance%20Required"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:underline bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-900/50"
+                  >
+                    <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                      <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.155.57 4.18 1.572 5.928l-1.672 6.104 6.27-1.644c1.704.939 3.655 1.472 5.83 1.472 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/>
+                    </svg>
+                    <span>WhatsApp</span>
+                  </a>
+                </div>
               </div>
             </form>
           )}

@@ -10,6 +10,7 @@ import { useAppContext } from '@/app/context/AppContext';
 import { useSearchParams } from 'next/navigation';
 import { SPECIALTIES } from '@/lib/data';
 import { DoctorCard } from '../ui/DoctorCard';
+import { BrowseModeToggle } from '../ui/BrowseModeToggle';
 
 const GUEST_LOCATION_KEY = 'aurahealth_guest_location';
 
@@ -250,6 +251,7 @@ export const SearchScreen = () => {
   return (
     <div className="min-h-full bg-slate-50/70 dark:bg-gray-900 py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        <BrowseModeToggle active="doctors" />
 
         {/* ── 📍 GPS PROMPT BANNER (if denied) ──────────────────────────────── */}
         {showLocationPrompt && locationStatus === 'denied' && (

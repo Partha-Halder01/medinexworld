@@ -307,7 +307,7 @@ export const RegisterScreen = () => {
                       type="tel"
                       autoComplete="tel"
                       inputMode="tel"
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 81455 22359"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition-all text-sm sm:text-base shadow-xs"

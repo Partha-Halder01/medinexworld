@@ -370,7 +370,7 @@ export const DoctorProfileScreen = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Phone Number</label>
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} placeholder="+91 98765 43210" />
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} placeholder="+91 81455 22359" />
                 </div>
               </div>
             </div>

@@ -41,7 +41,7 @@ export const AdminDashboardScreen = () => {
     gstPercent: 0, 
     discountAmount: 0, 
     defaultPlatformFeePercent: 10,
-    supportPhone: '+91 98765 43210',
+    supportPhone: '+91 81455 22359',
     supportEmail: 'support@medinexworld.com',
     emergencyPhone: '112',
     contactAddress: '',
@@ -69,7 +69,7 @@ export const AdminDashboardScreen = () => {
             gstPercent: Number(data.gstPercent) || 0,
             discountAmount: Number(data.discountAmount) || 0,
             defaultPlatformFeePercent: Number(data.defaultPlatformFeePercent) || 10,
-            supportPhone: data.supportPhone || '+91 98765 43210',
+            supportPhone: data.supportPhone || '+91 81455 22359',
             supportEmail: data.supportEmail || 'support@medinexworld.com',
             emergencyPhone: data.emergencyPhone || '112',
             contactAddress: data.contactAddress || '',
@@ -345,7 +345,7 @@ export const AdminDashboardScreen = () => {
                   type="text"
                   value={platformSettings.supportPhone}
                   onChange={(e) => setPlatformSettings({ ...platformSettings, supportPhone: e.target.value })}
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 81455 22359"
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 focus:border-teal-500 rounded-xl text-xs md:text-sm font-bold text-gray-900 dark:text-white transition-all outline-none"
                 />
               </div>

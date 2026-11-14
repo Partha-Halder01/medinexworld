@@ -889,7 +889,7 @@ export const AdminDoctorsScreen = () => {
                   </div>
                   <div className={`space-y-1.5 ${editingDoctor ? 'col-span-1 sm:col-span-2' : 'col-span-1'}`}>
                     <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Phone Number <span className="text-red-500">*</span></label>
-                    <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" placeholder="+91 98765 43210" />
+                    <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30" placeholder="+91 81455 22359" />
                   </div>
                   {!editingDoctor && (
                     <div className="space-y-1.5">

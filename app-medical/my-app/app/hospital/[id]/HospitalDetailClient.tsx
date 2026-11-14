@@ -19,7 +19,7 @@ export const HospitalDetailClient = () => {
   const [hospital, setHospital] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'lab' | 'surgery' | 'doctors' | 'photos'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'lab' | 'surgery' | 'doctors' | 'photos'>('doctors');
   
   // Booking Modal State
   const [bookingModal, setBookingModal] = useState<{
@@ -151,17 +151,22 @@ export const HospitalDetailClient = () => {
     calculateTotalWithPlatformFee(baseAmount, hospitalPlatformFeePercent);
   const formatCurrency = (amount: number) => `\u20B9${amount}`;
 
+  const kindLabel = facilityKindLabel(hospital.facilityKind);
+  const doctorCount: number = hospital.doctors?.length || 0;
+  const inNowCount: number = (hospital.doctors || []).filter((d: any) => d.chamber?.isDoctorIn).length;
+  const doctorSpecialties: string[] = [...new Set<string>((hospital.doctors || []).map((d: any) => d.specialty).filter(Boolean))];
+
   const detailTabs = [
+    { key: 'doctors' as const, label: `${t('hospital.doctors')}${doctorCount ? ` (${doctorCount})` : ''}` },
     { key: 'overview' as const, label: t('hospital.about') },
-    { key: 'doctors' as const, label: t('hospital.doctors') },
     { key: 'photos' as const, label: t('hospital.photos') },
   ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8 space-y-6">
       {/* Back Button */}
-      <Link href="/hospital" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-        <ArrowLeft size={16} /> {t('common.back')}
+      <Link href="/clinics" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+        <ArrowLeft size={16} /> All clinics &amp; hospitals
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -265,7 +270,7 @@ export const HospitalDetailClient = () => {
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 {about && (
                   <div className="prose dark:prose-invert max-w-none">
-                    <h3 className="text-lg font-black text-gray-900 dark:text-white mb-3">About Hospital</h3>
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white mb-3">About {kindLabel}</h3>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed font-medium">{about}</p>
                   </div>
                 )}
@@ -469,11 +474,19 @@ export const HospitalDetailClient = () => {
           <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/20">
             <h3 className="text-lg font-black mb-2 flex items-center gap-2">
               <CheckCircle size={20} />
-              Verified Hospital
+              Verified {kindLabel}
             </h3>
             <p className="text-sm text-blue-50 font-medium mb-6 opacity-90">
               This facility is verified and adheres to platform healthcare standards.
             </p>
+            {doctorCount > 0 && activeTab !== 'doctors' && (
+              <button
+                onClick={() => setActiveTab('doctors')}
+                className="w-full mb-4 py-4 bg-emerald-400 hover:bg-emerald-300 text-emerald-950 rounded-2xl font-black uppercase tracking-wider text-xs sm:text-sm active:scale-95 transition-all"
+              >
+                Book a Doctor ({doctorCount})
+              </button>
+            )}
             <div className="space-y-4">
               <button 
                 onClick={() => {
@@ -504,20 +517,30 @@ export const HospitalDetailClient = () => {
 
           {/* Opening Hours or similar info */}
           <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
-            <h3 className="font-black text-sm text-gray-900 dark:text-white mb-4 uppercase tracking-wider">General Information</h3>
+            <h3 className="font-black text-sm text-gray-900 dark:text-white mb-4 uppercase tracking-wider">At a Glance</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-700">
-                <span className="text-xs sm:text-sm font-bold text-gray-500 uppercase">Emergency</span>
-                <span className="text-xs sm:text-sm font-black text-red-500 uppercase tracking-wider">24/7 Available</span>
+                <span className="text-xs sm:text-sm font-bold text-gray-500 uppercase">Type</span>
+                <span className="text-xs sm:text-sm font-black text-gray-700 dark:text-gray-300">{kindLabel}</span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-700">
-                <span className="text-xs sm:text-sm font-bold text-gray-500 uppercase">OPD Timing</span>
-                <span className="text-xs sm:text-sm font-black text-gray-700 dark:text-gray-300">09:00 AM - 05:00 PM</span>
+                <span className="text-xs sm:text-sm font-bold text-gray-500 uppercase">Doctors</span>
+                <span className="text-xs sm:text-sm font-black text-gray-700 dark:text-gray-300">{doctorCount}</span>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-xs sm:text-sm font-bold text-gray-500 uppercase">Blood Bank</span>
-                <span className="text-xs sm:text-sm font-black text-emerald-500 uppercase tracking-wider">Available</span>
+              <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-700">
+                <span className="text-xs sm:text-sm font-bold text-gray-500 uppercase">IN right now</span>
+                <span className={`text-xs sm:text-sm font-black ${inNowCount > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>{inNowCount}</span>
               </div>
+              {doctorSpecialties.length > 0 && (
+                <div className="py-2">
+                  <span className="block text-xs sm:text-sm font-bold text-gray-500 uppercase mb-2">Specialties</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {doctorSpecialties.map(s => (
+                      <span key={s} className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

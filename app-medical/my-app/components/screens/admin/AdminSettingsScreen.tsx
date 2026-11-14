@@ -14,7 +14,7 @@ export const AdminSettingsScreen = () => {
   const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
-    supportPhone: '+91 98765 43210',
+    supportPhone: '+91 81455 22359',
     supportEmail: 'support@medinexworld.com',
     emergencyPhone: '112',
     contactAddress: '',
@@ -31,7 +31,7 @@ export const AdminSettingsScreen = () => {
       .then(data => {
         if (!data.error) {
           setFormData({
-            supportPhone: data.supportPhone || '+91 98765 43210',
+            supportPhone: data.supportPhone || '+91 81455 22359',
             supportEmail: data.supportEmail || 'support@medinexworld.com',
             emergencyPhone: data.emergencyPhone || '112',
             contactAddress: data.contactAddress || '',
@@ -163,7 +163,7 @@ export const AdminSettingsScreen = () => {
                 type="text"
                 value={formData.supportPhone}
                 onChange={e => setFormData({ ...formData, supportPhone: e.target.value })}
-                placeholder="+91 98765 43210"
+                placeholder="+91 81455 22359"
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rounded-2xl text-sm font-semibold text-gray-900 dark:text-white transition-all outline-none"
               />
               <p className="text-[11px] text-gray-400">
@@ -239,7 +239,7 @@ export const AdminSettingsScreen = () => {
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs pb-3 border-b border-slate-100 dark:border-slate-800">
               <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                 <Phone size={13} className="text-teal-600" />
-                Helpline: <strong className="text-teal-700 dark:text-teal-400">{formData.supportPhone || '+91 98765 43210'}</strong>
+                Helpline: <strong className="text-teal-700 dark:text-teal-400">{formData.supportPhone || '+91 81455 22359'}</strong>
               </span>
               <span className="font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
                 <Mail size={13} className="text-blue-500" />

@@ -5,6 +5,7 @@ import { useLanguage } from '@/app/context/LanguageContext';
 import { VideoCallScreen } from '@/components/screens/VideoCallScreen';
 import { Toast } from '@/components/ui/Toast';
 import { HelpPopup } from '@/components/ui/HelpPopup';
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 import { ShieldAlert, PhoneCall, Navigation } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -109,8 +110,13 @@ export const GlobalComponents = () => {
         </div>
       )}
 
-      {/* Help Popup — on patient-facing pages */}
-      {!activeVideoCall && !isSpecialPanel && <HelpPopup />}
+      {/* Help Popup & WhatsApp Contact — on patient-facing pages */}
+      {!activeVideoCall && !isSpecialPanel && (
+        <>
+          <HelpPopup />
+          <WhatsAppButton />
+        </>
+      )}
 
       {/* Emergency Header Bar — only on patient-facing mobile pages (HIDDEN per user request) */}
       {/* 

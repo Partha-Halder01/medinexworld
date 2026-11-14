@@ -32,7 +32,7 @@ export async function GET(req: Request) {
             type: 'Private Hospital',
             address: 'Update hospital address',
             email: user.email,
-            phone: user.phone || '+91 98765 43210',
+            phone: user.phone || '+91 81455 22359',
             isActive: true,
             facilities: ['Emergency', 'OPD', 'Pharmacy'],
             departments: ['General Medicine'],
