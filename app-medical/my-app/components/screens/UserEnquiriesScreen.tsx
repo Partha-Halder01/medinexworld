@@ -448,11 +448,10 @@ export const UserEnquiriesScreen = () => {
                             </p>
                             <button
                               type="button"
-                              onClick={() => setPreviewDoc({ url: enquiry.fileData, title: 'Doctor Prescription' })}
-                              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
+                              onClick={() => setPreviewImage(enquiry.fileData)}
+                              className="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-bold hover:underline"
                             >
-                              <span>View / Download Prescription</span>
-                              <ExternalLink size={12} />
+                              <ExternalLink size={14} /> View Attached Prescription
                             </button>
                           </div>
                         )}
